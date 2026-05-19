@@ -38,8 +38,8 @@
         </span>
       </header>
 
-      @if (sections(); as secs) {
-        @for (sec of secs; track sec.kind) {
+      @if (sections().length > 0) {
+        @for (sec of sections(); track sec.kind) {
           <div class="seg-section">
             <header class="seg-section-head">
               <h3>{{ sec.label }} <span class="num">{{ sec.subjects.length }}</span></h3>
