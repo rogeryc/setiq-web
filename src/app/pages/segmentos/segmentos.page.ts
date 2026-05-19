@@ -36,6 +36,8 @@ const KIND_META: Record<SubjectKind, { label: string; description: string; order
 
 const LAST_MENTION_FORMAT = new Intl.RelativeTimeFormat('es-BO', { numeric: 'auto' });
 
+type Filter = SubjectKind | 'all';
+
 @Component({
   selector: 'app-segmentos-page',
   imports: [],
@@ -48,13 +50,40 @@ export class SegmentosPage implements OnInit {
 
   protected readonly data = signal<ApiTrackedSubject[] | null>(null);
   protected readonly error = signal<string | null>(null);
+  protected readonly filter = signal<Filter>('all');
+
+  /** Counts per kind for the filter pills. */
+  protected readonly counts = computed(() => {
+    const subjects = this.data() ?? [];
+    const counts: Record<SubjectKind, number> = {
+      brand: 0, competitor: 0, keyword: 0, hashtag: 0,
+    };
+    for (const s of subjects) counts[s.kind]++;
+    return counts;
+  });
+
+  /** Filter chip definitions in display order. */
+  protected readonly filterOptions = computed<{ key: Filter; label: string; count: number }[]>(() => {
+    const data = this.data() ?? [];
+    const c = this.counts();
+    return [
+      { key: 'all',         label: 'Todos',        count: data.length },
+      { key: 'brand',       label: 'Marca propia', count: c.brand },
+      { key: 'competitor',  label: 'Competidores', count: c.competitor },
+      { key: 'keyword',     label: 'Temas',        count: c.keyword },
+      { key: 'hashtag',     label: 'Hashtags',     count: c.hashtag },
+    ];
+  });
 
   protected readonly sections = computed<KindSection[]>(() => {
     const subjects = this.data() ?? [];
+    const active = this.filter();
     const buckets: Record<SubjectKind, ApiTrackedSubject[]> = {
       brand: [], competitor: [], keyword: [], hashtag: [],
     };
-    for (const s of subjects) buckets[s.kind].push(s);
+    for (const s of subjects) {
+      if (active === 'all' || s.kind === active) buckets[s.kind].push(s);
+    }
 
     return (Object.keys(buckets) as SubjectKind[])
       .filter((k) => buckets[k].length > 0)
@@ -66,6 +95,10 @@ export class SegmentosPage implements OnInit {
         subjects: buckets[k],
       }));
   });
+
+  setFilter(f: Filter): void {
+    this.filter.set(f);
+  }
 
   protected readonly totalMentions = computed(() =>
     (this.data() ?? []).reduce((sum, s) => sum + (s.mention_count || 0), 0),

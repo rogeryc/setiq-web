@@ -38,6 +38,19 @@
         </span>
       </header>
 
+      <div class="seg-filterbar">
+        @for (opt of filterOptions(); track opt.key) {
+          <button type="button"
+                  class="seg-filterbtn"
+                  [class.active]="filter() === opt.key"
+                  [disabled]="opt.count === 0 && opt.key !== 'all'"
+                  (click)="setFilter(opt.key)">
+            {{ opt.label }}
+            <span class="seg-filterbtn-count">{{ opt.count }}</span>
+          </button>
+        }
+      </div>
+
       @if (sections().length > 0) {
         @for (sec of sections(); track sec.kind) {
           <div class="seg-section">
