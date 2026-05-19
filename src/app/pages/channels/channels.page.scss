@@ -1,0 +1,66 @@
+// Channels admin page. Reuses .s-admin / .s-table from setiq.css; adds the
+// brand-colored channel cell and a few small tweaks.
+
+:host { display: contents; }
+
+.s-channels-table {
+  .row.dim {
+    opacity: 0.55;
+  }
+
+  .ch-cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--rule-strong);
+    background: var(--card);
+
+    &.instagram { color: #E1306C; border-color: rgba(225, 48, 108, 0.30); }
+    &.facebook  { color: #1877F2; border-color: rgba(24, 119, 242, 0.32); }
+    &.tiktok    { color: #25F4EE; border-color: rgba(37, 244, 238, 0.28); }
+    &.email     { color: #C9CFDB; }
+    &.whatsapp  { color: #25D366; border-color: rgba(37, 211, 102, 0.32); }
+    &.phone     { color: var(--muted); }
+  }
+
+  .name .msg {
+    font-size: 11px;
+    color: var(--warn);
+    margin-top: 2px;
+
+    &.muted { color: var(--muted); }
+  }
+
+  .acc {
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+
+  .sync {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .modules {
+    display: flex;
+    gap: 12px;
+    font-size: 11.5px;
+  }
+}
+
+.footnote {
+  margin-top: 24px;
+  padding: 14px 18px;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 720px;
+
+  b { color: var(--ink); font-weight: 600; }
+}

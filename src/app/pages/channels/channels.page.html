@@ -1,0 +1,99 @@
+<main class="s-main">
+  <div class="s-admin">
+
+    <!-- Admin sidebar -->
+    <aside class="s-admin-side">
+      <span class="caps">Administración</span>
+      <button type="button" class="active">
+        Canales conectados
+        @if (data(); as d) {
+          <span class="sub">
+            {{ d.connected_count }} activos
+            @if (d.warning_count > 0) { · {{ d.warning_count }} con atención }
+          </span>
+        } @else {
+          <span class="sub">Cargando…</span>
+        }
+      </button>
+      <button type="button">Equipo<span class="sub">próximamente</span></button>
+      <button type="button">Inquilino y módulos<span class="sub">Core + Kaizen</span></button>
+      <button type="button">Facturación<span class="sub">próximamente</span></button>
+      <button type="button">Webhooks y API<span class="sub">próximamente</span></button>
+      <button type="button">Registro de auditoría</button>
+    </aside>
+
+    <!-- Main: connected-channels table -->
+    <section class="s-admin-main">
+      <h1>Canales conectados</h1>
+      <p class="lede">
+        SETIQ analiza las interacciones de los canales que conectás acá, más las
+        menciones públicas y posts de los <em>tracked subjects</em> que configures
+        en Segmentos.
+      </p>
+      <div class="toolbar">
+        <button type="button" class="s-btn acc">+ Conectar canal</button>
+        <button type="button" class="s-btn">Sincronizar todo</button>
+        <button type="button" class="s-btn ghost">Ver tracked subjects</button>
+      </div>
+
+      <div class="s-table s-channels-table">
+        <div class="row head">
+          <span></span>
+          <span>Canal</span>
+          <span>Cuenta</span>
+          <span>Estado</span>
+          <span>Última sincronización</span>
+          <span>Módulos</span>
+        </div>
+
+        @if (data(); as d) {
+          @for (c of d.channels; track c.key) {
+            <div class="row" [class.dim]="!c.connected">
+              <span class="ch-cell" [class]="'ch-cell ' + brandClass(c.key)">
+                <app-icon [name]="iconFor(c.key)" [size]="18" />
+              </span>
+              <div class="name">
+                {{ c.label }}
+                @if (c.warning; as w) {
+                  <div class="msg">⚠ {{ w }}</div>
+                }
+                @if (!c.connected && !c.warning) {
+                  <div class="msg muted">No conectado</div>
+                }
+              </div>
+              <span class="acc">{{ c.account_label || '—' }}</span>
+              <span class="s-status"
+                    [class.ok]="c.status === 'active'"
+                    [class.warn]="c.status === 'warning'"
+                    [class.off]="c.status === 'disconnected'">
+                <span class="d"></span>{{ statusLabel(c.status) }}
+              </span>
+              <span class="sync">{{ formatLastSync(c.last_sync_at) }}</span>
+              <div class="modules">
+                <span class="s-toggle">
+                  <span class="s-sw" [class.on]="c.modules.setiq"></span>Core
+                </span>
+                <span class="s-toggle">
+                  <span class="s-sw" [class.on]="c.modules.kaizen"></span>Kaizen
+                </span>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="row">
+            <span></span>
+            <div class="name" style="color:var(--muted)">Cargando canales…</div>
+          </div>
+        }
+      </div>
+
+      <p class="footnote">
+        <b>Sobre el alcance.</b> Lo que aparece acá son los canales propios de la
+        marca. Las menciones <em>fuera</em> de esas propiedades (posts de competidores,
+        keywords en general) se ingestan por separado vía Apify y se configuran en
+        Segmentos.
+      </p>
+    </section>
+
+  </div>
+</main>

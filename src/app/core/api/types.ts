@@ -137,3 +137,27 @@ export interface ApiConversationDetail {
   is_thread?: boolean;
   participant_count?: number;
 }
+
+export interface ApiModuleToggles {
+  setiq: boolean;
+  kaizen: boolean;
+}
+
+export type ChannelKey = 'instagram' | 'facebook' | 'tiktok' | 'email' | 'whatsapp' | 'phone';
+
+export interface ApiChannelStatus {
+  key: ChannelKey;
+  label: string;
+  connected: boolean;
+  account_label?: string;
+  status: 'active' | 'warning' | 'disconnected';
+  last_sync_at?: string;
+  modules: ApiModuleToggles;
+  warning?: string;
+}
+
+export interface ApiChannelsResponse {
+  channels: ApiChannelStatus[];
+  connected_count: number;
+  warning_count: number;
+}
