@@ -4,11 +4,20 @@
     <!-- Hero: lead + 4 KPI cards -->
     <section class="s-hero">
       <div class="s-hero-lead">
-        <div>
-          <span class="caps">Resumen ejecutivo · 30 días</span>
-          <h1>{{ leadHeadline }} <em>{{ leadHeadlineEm }}</em></h1>
-        </div>
-        <p class="lede">{{ leadCopy }}</p>
+        @if (data()?.lead; as lead) {
+          <div>
+            <span class="caps">Resumen ejecutivo · 30 días</span>
+            <h1>
+              {{ lead.title }}@if (lead.title_em; as e) { <em>{{ e }}</em>}
+            </h1>
+          </div>
+          <p class="lede">{{ lead.body }}</p>
+        } @else {
+          <div>
+            <span class="caps">Resumen ejecutivo · 30 días</span>
+            <h1 style="color:var(--muted)">Cargando resumen…</h1>
+          </div>
+        }
       </div>
       <div class="s-hero-kpis">
         @if (data(); as d) {
@@ -47,15 +56,21 @@
       </header>
 
       <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-top:20px">
-        <app-featured-rec-card
-          [title]="featuredRec.title"
-          [titleEm]="featuredRec.titleEm"
-          [titleTail]="featuredRec.titleTail"
-          [body]="featuredRec.body"
-          [confidence]="featuredRec.confidence"
-          [age]="featuredRec.age"
-          [impact]="featuredRec.impact"
-          [actions]="featuredRec.actions" />
+        @if (data()?.featured_recommendation; as rec) {
+          <app-featured-rec-card
+            [title]="rec.title"
+            [titleEm]="rec.title_em"
+            [titleTail]="rec.title_tail"
+            [body]="rec.body"
+            [confidence]="rec.confidence"
+            [age]="rec.age"
+            [impact]="rec.impact"
+            [actions]="rec.actions" />
+        } @else {
+          <article class="s-feature-rec">
+            <span class="caps muted">Cargando recomendación…</span>
+          </article>
+        }
 
         <app-chart-card title="Canales" meta="30 días">
           <div class="s-donut-row">
@@ -87,16 +102,24 @@
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px">
-        @for (m of memos; track m.tag) {
-          <app-memo-card
-            [severity]="m.severity"
-            [tag]="m.tag"
-            [confidence]="m.confidence ?? null"
-            [title]="m.title"
-            [titleEm]="m.titleEm ?? null"
-            [body]="m.body"
-            [actions]="m.actions ?? []"
-            [footnote]="m.footnote ?? null" />
+        @if (data()?.memos; as memos) {
+          @for (m of memos; track m.tag) {
+            <app-memo-card
+              [severity]="m.severity"
+              [tag]="m.tag"
+              [confidence]="m.confidence"
+              [title]="m.title"
+              [titleEm]="m.title_em"
+              [body]="m.body"
+              [actions]="m.actions"
+              [footnote]="m.footnote" />
+          }
+        } @else {
+          @for (i of [0,1,2]; track i) {
+            <article class="s-memo">
+              <span class="caps muted">Cargando memo…</span>
+            </article>
+          }
         }
       </div>
     </section>
