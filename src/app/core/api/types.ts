@@ -90,6 +90,8 @@ export interface ApiConversationSummary {
   sentiment?: 'positive' | 'neutral' | 'negative';
   intent?: string;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
+  /** Set only when the row aggregates a whole thread (group_by=thread). */
+  participant_count?: number;
 }
 
 export interface ApiConversationGroup {
@@ -114,6 +116,9 @@ export interface ApiMessageDetail {
   sent_at: string;
   sentiment?: string;
   intent?: string;
+  /** Set when the detail spans multiple contacts (thread view). */
+  sender_name?: string;
+  sender_handle?: string;
 }
 
 export interface ApiConversationDetail {
@@ -129,4 +134,6 @@ export interface ApiConversationDetail {
   intent?: string;
   priority?: string;
   messages: ApiMessageDetail[];
+  is_thread?: boolean;
+  participant_count?: number;
 }

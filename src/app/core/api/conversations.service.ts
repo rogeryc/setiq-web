@@ -25,10 +25,14 @@ export class ConversationsService {
     );
   }
 
-  async detail(id: string): Promise<ApiConversationDetail> {
+  async detail(id: string, asThread = false): Promise<ApiConversationDetail> {
     await this.auth.ensureLoggedIn();
+    const params = asThread ? new HttpParams().set('as_thread', 'true') : undefined;
     return firstValueFrom(
-      this.http.get<ApiConversationDetail>(`${API_BASE}/conversations/${id}`),
+      this.http.get<ApiConversationDetail>(
+        `${API_BASE}/conversations/${id}`,
+        params ? { params } : {},
+      ),
     );
   }
 }

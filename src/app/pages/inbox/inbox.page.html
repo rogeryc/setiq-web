@@ -46,8 +46,20 @@
                   </span>
                   <div class="body">
                     <div class="top">
-                      <span class="name">{{ c.contact_name || c.contact_handle }}</span>
-                      <span class="at">{{ c.contact_handle }}</span>
+                      <span class="name">
+                        @if (c.participant_count && c.participant_count > 1) {
+                          {{ c.subject || 'Hilo' }}
+                        } @else {
+                          {{ c.contact_name || c.contact_handle }}
+                        }
+                      </span>
+                      <span class="at">
+                        @if (c.participant_count && c.participant_count > 1) {
+                          {{ c.participant_count }} personas
+                        } @else {
+                          {{ c.contact_handle }}
+                        }
+                      </span>
                       <span class="time">{{ formatRelative(c.last_message_at) }}</span>
                     </div>
                     <div class="sn">{{ c.last_message_preview }}</div>
@@ -113,7 +125,12 @@
           @if (detail(); as d) {
             @for (m of d.messages; track m.id) {
               <div class="s-msg" [class.outbound]="m.direction === 'outbound'">
-                <span class="t">{{ formatTime(m.sent_at) }}</span>
+                <span class="t">
+                  @if (m.sender_name; as sn) {
+                    <b class="sender">{{ sn }}</b> ·
+                  }
+                  {{ formatTime(m.sent_at) }}
+                </span>
                 {{ m.content_text }}
               </div>
             }

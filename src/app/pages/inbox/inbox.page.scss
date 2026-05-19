@@ -159,4 +159,10 @@
 .s-detail-thread {
   overflow-y: auto;
   flex: 1;
+
+  // When the thread mode renders multiple senders, the sender label is bolder.
+  .s-msg .t .sender {
+    color: var(--ink);
+    font-weight: 600;
+  }
 }

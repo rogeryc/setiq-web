@@ -66,6 +66,10 @@ export class InboxPage implements OnInit {
   async setGroupBy(g: GroupBy): Promise<void> {
     if (g === this.groupBy()) return;
     this.groupBy.set(g);
+    // Drop any prior selection — the same id may not be in the new grouping,
+    // and the detail shape changes when toggling to/from thread mode.
+    this.selectedId.set(null);
+    this.detail.set(null);
     await this.loadList(g);
   }
 
@@ -73,7 +77,7 @@ export class InboxPage implements OnInit {
     this.selectedId.set(id);
     this.detail.set(null);
     try {
-      const d = await this.service.detail(id);
+      const d = await this.service.detail(id, this.groupBy() === 'thread');
       this.detail.set(d);
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : String(e));
