@@ -58,6 +58,21 @@ export class OverviewPage implements OnInit {
     () => this.data()?.top_growth_channel ?? '—',
   );
 
+  private static readonly TIME_FORMAT = new Intl.DateTimeFormat('es-BO', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'America/La_Paz',
+  });
+
+  protected readonly refreshLabel = computed(() => {
+    const at = this.overviewService.lastFetchedAt();
+    return at ? OverviewPage.TIME_FORMAT.format(at) : null;
+  });
+
   async ngOnInit(): Promise<void> {
     if (!this.isBrowser) return;
     try {

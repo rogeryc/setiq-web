@@ -1,7 +1,18 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 
 import { IconComponent } from '../../core/icons/icon';
+import { OverviewService } from '../../core/api/overview.service';
 import { ThemeService } from '../../core/theme.service';
+
+const TIME_FORMAT = new Intl.DateTimeFormat('es-BO', {
+  weekday: 'short',
+  day: 'numeric',
+  month: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+  timeZone: 'America/La_Paz',
+});
 
 @Component({
   selector: 'app-masthead',
@@ -10,9 +21,13 @@ import { ThemeService } from '../../core/theme.service';
 })
 export class MastheadComponent {
   readonly theme = inject(ThemeService);
+  private readonly overview = inject(OverviewService);
 
-  // Static for now; will become inputs / async data once we wire the API.
   readonly tenantLabel = 'Thalma · Bolivia';
   readonly userInitials = 'TH';
-  readonly nowLabel = 'vie · 19 may · 14:32 ART';
+
+  readonly nowLabel = computed(() => {
+    const at = this.overview.lastFetchedAt();
+    return at ? TIME_FORMAT.format(at) : '— actualizando…';
+  });
 }

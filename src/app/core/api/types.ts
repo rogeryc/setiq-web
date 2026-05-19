@@ -67,6 +67,7 @@ export interface ApiOverviewResponse {
   lead?: ApiLeadCopy;
   featured_recommendation?: ApiFeaturedRec;
   memos: ApiMemo[];
+  generated_at: string;  // ISO 8601
 }
 
 export interface ApiTokenResponse {

@@ -52,7 +52,13 @@
       <header class="s-secthead">
         <h2>Decisiones de la semana</h2>
         <span class="sub">Lo que tu equipo debería resolver antes del viernes</span>
-        <span class="right">Generado por SETIQ · vie 19 may · 14:32</span>
+        <span class="right">
+          @if (refreshLabel(); as ts) {
+            Datos consultados al {{ ts }} (Bolivia) · se actualizan al recargar la página
+          } @else {
+            Generado por SETIQ
+          }
+        </span>
       </header>
 
       <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-top:20px">

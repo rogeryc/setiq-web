@@ -6,7 +6,7 @@
   </button>
   <div class="s-mast-spacer"></div>
   <div class="s-mast-meta">
-    <span>{{ nowLabel }}</span>
+    <span [title]="'Hora local Bolivia. Datos al cargar la página.'">{{ nowLabel() }}</span>
     <button class="s-search" type="button">
       <app-icon name="search" [size]="14" />
       <span>Buscar conversaciones, segmentos…</span>
