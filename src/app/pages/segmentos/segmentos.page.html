@@ -1,0 +1,103 @@
+<main class="s-main">
+  <div class="s-wrap">
+
+    <section class="s-hero seg-hero">
+      <div class="s-hero-lead">
+        <div>
+          <span class="caps">Segmentos · Monitoreo</span>
+          <h1>Qué está mirando SETIQ por vos.</h1>
+        </div>
+        <p class="lede">
+          Cada segmento es algo que SETIQ rastrea en tiempo real — tu marca, tus
+          competidores, temas y hashtags. Apify recoge menciones públicas; Meta
+          Graph trae las de tus propios canales conectados.
+        </p>
+      </div>
+      <div class="seg-stats">
+        @if (data(); as d) {
+          <article class="seg-stat">
+            <span class="caps muted">Sujetos activos</span>
+            <div class="v num">{{ enabledCount() }}</div>
+            <span class="sub">de {{ d.length }} configurados</span>
+          </article>
+          <article class="seg-stat">
+            <span class="caps muted">Menciones acumuladas</span>
+            <div class="v num">{{ totalMentions() }}</div>
+            <span class="sub">en los últimos 30 días</span>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="s-section">
+      <header class="s-secthead">
+        <h2>Sujetos rastreados</h2>
+        <span class="sub">Editá la lista cuando quieras — los cambios se propagan al próximo ciclo de scraping.</span>
+        <span class="right">
+          <button type="button" class="s-btn acc">+ Agregar sujeto</button>
+        </span>
+      </header>
+
+      @if (sections(); as secs) {
+        @for (sec of secs; track sec.kind) {
+          <div class="seg-section">
+            <header class="seg-section-head">
+              <h3>{{ sec.label }} <span class="num">{{ sec.subjects.length }}</span></h3>
+              <span class="sub">{{ sec.description }}</span>
+            </header>
+            <div class="seg-grid">
+              @for (s of sec.subjects; track s.id) {
+                <article class="seg-card" [class.dim]="!s.enabled" [attr.data-kind]="s.kind">
+                  <header class="seg-card-head">
+                    <span class="seg-kind">{{ sec.label }}</span>
+                    <span class="seg-state" [class.on]="s.enabled">
+                      {{ s.enabled ? 'Activo' : 'Pausado' }}
+                    </span>
+                  </header>
+                  <h4 class="seg-card-title">{{ s.label }}</h4>
+
+                  @if (handleEntries(s.handles).length > 0) {
+                    <div class="seg-chips">
+                      @for (h of handleEntries(s.handles); track h[0]) {
+                        <span class="seg-chip handle"
+                              [attr.data-platform]="h[0]"
+                              [title]="h[0]">{{ h[1] }}</span>
+                      }
+                    </div>
+                  }
+
+                  @if (s.keywords.length > 0) {
+                    <div class="seg-chips">
+                      @for (k of s.keywords; track k) {
+                        <span class="seg-chip kw">{{ k }}</span>
+                      }
+                    </div>
+                  }
+
+                  @if (s.hashtags.length > 0) {
+                    <div class="seg-chips">
+                      @for (tag of s.hashtags; track tag) {
+                        <span class="seg-chip hash">#{{ tag }}</span>
+                      }
+                    </div>
+                  }
+
+                  <footer class="seg-card-foot">
+                    <span class="num">{{ s.mention_count }} menciones</span>
+                    <span class="sub">·</span>
+                    <span class="sub">{{ formatLastMention(s.last_mention_at) }}</span>
+                  </footer>
+                </article>
+              }
+            </div>
+          </div>
+        }
+      } @else if (error()) {
+        <div class="seg-empty">Error: {{ error() }}</div>
+      } @else {
+        <div class="seg-empty">Cargando segmentos…</div>
+      }
+    </section>
+
+  </div>
+</main>

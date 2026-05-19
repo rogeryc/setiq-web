@@ -161,3 +161,19 @@ export interface ApiChannelsResponse {
   connected_count: number;
   warning_count: number;
 }
+
+export type SubjectKind = 'competitor' | 'brand' | 'keyword' | 'hashtag';
+
+export interface ApiTrackedSubject {
+  id: string;
+  kind: SubjectKind;
+  label: string;
+  handles: Record<string, string>;   // { instagram: "@foo", tiktok: "@foo.tt", ... }
+  keywords: string[];
+  hashtags: string[];
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+  mention_count: number;
+  last_mention_at?: string;
+}
