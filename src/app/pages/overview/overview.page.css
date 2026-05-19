@@ -1,0 +1,3 @@
+/* Host is rendered inside .app as a sibling of router-outlet. Let its
+   children participate directly in the flex layout. */
+:host { display: contents; }

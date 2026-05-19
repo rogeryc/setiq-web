@@ -1,0 +1,29 @@
+<div class="app" [class.dark]="theme.dark()" id="app">
+
+  <header class="s-mast">
+    <span class="s-mark">setiq<em>.</em></span>
+    <button class="s-tenant" type="button">
+      <span class="dot"></span>Fravia · Argentina <span class="caret">▾</span>
+    </button>
+    <div class="s-mast-spacer"></div>
+    <div class="s-mast-meta">
+      <span>vie · 19 may · 14:32 ART</span>
+      <button class="s-search" type="button">⌕<span>Buscar conversaciones, segmentos…</span><kbd>⌘K</kbd></button>
+      <button class="s-avatar" type="button" aria-label="Cuenta">CP</button>
+      <button type="button" class="s-btn ghost" style="padding:6px 10px" title="Cambiar tema" (click)="theme.toggle()">🌓</button>
+    </div>
+  </header>
+
+  <nav class="s-nav" aria-label="Secciones">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Resumen</a>
+    <a routerLink="/recomendaciones" routerLinkActive="active">Recomendaciones</a>
+    <a routerLink="/segmentos" routerLinkActive="active">Segmentos</a>
+    <a routerLink="/inbox" routerLinkActive="active">Inbox</a>
+    <a routerLink="/canales" routerLinkActive="active">Canales</a>
+    <a routerLink="/equipo" routerLinkActive="active">Equipo</a>
+    <a routerLink="/ajustes" routerLinkActive="active">Ajustes</a>
+    <span class="module">Módulo<span class="pill">Kaizen</span></span>
+  </nav>
+
+  <router-outlet />
+</div>
