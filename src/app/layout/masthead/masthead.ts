@@ -12,7 +12,7 @@ export class MastheadComponent {
   readonly theme = inject(ThemeService);
 
   // Static for now; will become inputs / async data once we wire the API.
-  readonly tenantLabel = 'Thalma · Argentina';
+  readonly tenantLabel = 'Thalma · Bolivia';
   readonly userInitials = 'TH';
   readonly nowLabel = 'vie · 19 may · 14:32 ART';
 }

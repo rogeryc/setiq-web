@@ -71,14 +71,14 @@ export class OverviewPage implements OnInit {
   readonly leadHeadline = 'Thalma está siendo escuchada.';
   readonly leadHeadlineEm = 'Y empezando a pedir cosas.';
   readonly leadCopy =
-    'Sentimiento estable salvo después de la nota del lunes en Rosario, donde un sector concentró críticas. La audiencia de TikTok empuja una serie sobre vivienda — la oportunidad tiene 3 meses.';
+    'Sentimiento estable salvo después de la nota del lunes en Santa Cruz, donde un sector concentró críticas. La audiencia de TikTok empuja una serie sobre vivienda — la oportunidad tiene 3 meses.';
 
   readonly featuredRec = {
     title: 'La nota sobre vivienda está disparando',
     titleEm: '57 comentarios negativos',
     titleTail: 'en 72h.',
     body:
-      'Las críticas se concentran en lectoras de Rosario y Córdoba que sienten que dejaste fuera el costo en provincias. ' +
+      'Las críticas se concentran en lectoras de Santa Cruz y Cochabamba que sienten que dejaste fuera el costo fuera del eje troncal. ' +
       'Sentimiento general aún positivo (0,72), pero el cluster geográfico es contenible si respondés con una nota lateral esta semana.',
     confidence: '92%',
     age: 'hace 1h',
