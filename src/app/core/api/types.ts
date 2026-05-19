@@ -74,3 +74,59 @@ export interface ApiTokenResponse {
   access_token: string;
   token_type: string;
 }
+
+export type GroupBy = 'intent' | 'channel' | 'sentiment' | 'thread';
+
+export interface ApiConversationSummary {
+  id: string;
+  contact_name?: string;
+  contact_handle: string;
+  channel: string;
+  last_message_at?: string;
+  last_message_preview?: string;
+  message_count: number;
+  status: string;
+  subject?: string;
+  sentiment?: 'positive' | 'neutral' | 'negative';
+  intent?: string;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+}
+
+export interface ApiConversationGroup {
+  key: string;
+  label: string;
+  count: number;
+  conversations: ApiConversationSummary[];
+}
+
+export interface ApiConversationsResponse {
+  group_by: GroupBy;
+  total: number;
+  groups: ApiConversationGroup[];
+}
+
+export interface ApiMessageDetail {
+  id: string;
+  direction: 'inbound' | 'outbound';
+  sender_type: 'contact' | 'agent' | 'ai' | 'system';
+  content_type: 'text' | 'image' | 'audio' | 'video' | 'file' | 'template';
+  content_text?: string;
+  sent_at: string;
+  sentiment?: string;
+  intent?: string;
+}
+
+export interface ApiConversationDetail {
+  id: string;
+  contact_name?: string;
+  contact_handle: string;
+  channel: string;
+  status: string;
+  subject?: string;
+  created_at: string;
+  last_message_at?: string;
+  sentiment?: string;
+  intent?: string;
+  priority?: string;
+  messages: ApiMessageDetail[];
+}

@@ -1,0 +1,145 @@
+// Read-only inbox styles. Builds on the .s-inbox / .s-conv styles in setiq.css
+// (which assume the 3-col handoff layout); we override to 2-col here and add
+// the grouping toggle + section headers.
+
+:host { display: contents; }
+
+.s-inbox-2col {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.grouping-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+  align-items: center;
+
+  .grouping-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 4px;
+  }
+
+  button {
+    background: transparent;
+    border: 1px solid var(--rule-strong);
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 11.5px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 80ms, border-color 80ms, background 80ms;
+
+    &:hover {
+      color: var(--ink);
+    }
+
+    &.active {
+      background: var(--acc-soft);
+      border-color: var(--acc-bright);
+      color: var(--acc-bright);
+      font-weight: 600;
+    }
+  }
+}
+
+.conv-group {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 4px;
+
+  &:last-child { border-bottom: none; }
+}
+
+.conv-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 16px 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  position: sticky;
+  top: 0;
+  background: linear-gradient(var(--bg), var(--bg) 80%, transparent);
+  backdrop-filter: blur(2px);
+  z-index: 1;
+}
+
+.conv-group-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--soft);
+}
+
+.ch-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--card-2);
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.s-conv {
+  // Override default cursor; we use (click) so it should look clickable.
+  cursor: pointer;
+
+  .tags .tag.muted {
+    color: var(--muted);
+    background: var(--card);
+    border: 1px solid var(--rule);
+  }
+
+  .ch-tag {
+    margin-right: 4px;
+  }
+}
+
+.conv-empty {
+  padding: 24px 16px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+
+  &.large {
+    font-size: 14px;
+    padding: 80px 16px;
+  }
+}
+
+.s-detail-footer {
+  padding: 12px 24px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--card);
+
+  .sub {
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+}
+
+// Make message thread scroll cleanly within the available height
+.s-detail {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.s-detail-thread {
+  overflow-y: auto;
+  flex: 1;
+}

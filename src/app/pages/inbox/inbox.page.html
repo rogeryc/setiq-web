@@ -1,0 +1,139 @@
+<main class="s-main">
+  <div class="s-inbox s-inbox-2col">
+
+    <!-- Left rail: grouping toggle + grouped conversation list -->
+    <aside class="s-inbox-list">
+      <header class="s-inbox-listhead">
+        <h2>Inbox <span class="badge">Kaizen</span></h2>
+        <div class="sub">
+          @if (data(); as d) { {{ d.total }} conversaciones }
+          @else { Cargando… }
+        </div>
+
+        <div class="grouping-toggle">
+          <span class="grouping-label">Agrupar por</span>
+          @for (opt of groupOptions; track opt.key) {
+            <button type="button"
+                    [class.active]="groupBy() === opt.key"
+                    (click)="setGroupBy(opt.key)">
+              {{ opt.label }}
+            </button>
+          }
+        </div>
+      </header>
+
+      <div class="s-conv-list">
+        @if (data(); as d) {
+          @for (group of d.groups; track group.key) {
+            <div class="conv-group">
+              <header class="conv-group-head">
+                <span class="conv-group-label">{{ group.label }}</span>
+                <span class="conv-group-count">{{ group.count }}</span>
+              </header>
+              @for (c of group.conversations; track c.id) {
+                <a class="s-conv"
+                   [class.active]="selectedId() === c.id"
+                   (click)="selectConversation(c.id)"
+                   role="button"
+                   tabindex="0">
+                  <span class="pri"
+                        [class.high]="c.priority === 'high' || c.priority === 'urgent'"
+                        [class.med]="c.priority === 'medium'"
+                        [class.low]="c.priority === 'low'"></span>
+                  <span class="ch-tag">{{ channelShort(c.channel) }}</span>
+                  <div class="body">
+                    <div class="top">
+                      <span class="name">{{ c.contact_name || c.contact_handle }}</span>
+                      <span class="at">{{ c.contact_handle }}</span>
+                      <span class="time">{{ formatRelative(c.last_message_at) }}</span>
+                    </div>
+                    <div class="sn">{{ c.last_message_preview }}</div>
+                    <div class="tags">
+                      @if (c.sentiment) {
+                        <span class="tag" [class.pos]="sentimentTone(c.sentiment) === 'pos'"
+                                          [class.neg]="sentimentTone(c.sentiment) === 'neg'">
+                          {{ c.sentiment === 'positive' ? 'positivo' :
+                             c.sentiment === 'negative' ? 'negativo' : 'neutral' }}
+                        </span>
+                      }
+                      @if (c.intent && c.intent !== 'other') {
+                        <span class="tag">{{ c.intent }}</span>
+                      }
+                      @if (c.message_count > 1) {
+                        <span class="tag muted">{{ c.message_count }} mensajes</span>
+                      }
+                    </div>
+                  </div>
+                </a>
+              }
+            </div>
+          }
+        } @else {
+          <div class="conv-empty">Cargando conversaciones…</div>
+        }
+      </div>
+    </aside>
+
+    <!-- Right pane: read-only conversation thread -->
+    <section class="s-detail">
+      @if (selectedConversation(); as sel) {
+        <header class="s-detail-head">
+          <div class="who">
+            <div class="s-avatar" style="width:38px;height:38px;font-size:13.5px">
+              {{ (sel.contact_name || sel.contact_handle).substring(0, 2).toUpperCase() }}
+            </div>
+            <div>
+              <div class="name">{{ sel.contact_name || sel.contact_handle }}</div>
+              <div class="at">{{ sel.contact_handle }} · {{ channelShort(sel.channel) }}</div>
+            </div>
+          </div>
+          <div class="meta">
+            @if (sel.intent && sel.intent !== 'other') {
+              <span>Intent: <b>{{ sel.intent }}</b></span>
+            }
+            @if (sel.sentiment) {
+              <span>Sentimiento: <b
+                [style.color]="sel.sentiment === 'negative' ? 'var(--neg)' :
+                                sel.sentiment === 'positive' ? 'var(--pos)' : 'inherit'">
+                {{ sel.sentiment }}</b></span>
+            }
+            @if (sel.priority) {
+              <span>Prioridad: <b>{{ sel.priority }}</b></span>
+            }
+            @if (sel.subject) {
+              <span>Hilo: <b>{{ sel.subject }}</b></span>
+            }
+          </div>
+        </header>
+
+        <div class="s-detail-thread">
+          @if (detail(); as d) {
+            @for (m of d.messages; track m.id) {
+              <div class="s-msg" [class.outbound]="m.direction === 'outbound'">
+                <span class="t">{{ formatTime(m.sent_at) }}</span>
+                {{ m.content_text }}
+              </div>
+            }
+            @if (d.messages.length === 0) {
+              <div class="conv-empty">Sin mensajes</div>
+            }
+          } @else {
+            <div class="conv-empty">Cargando mensajes…</div>
+          }
+        </div>
+
+        <footer class="s-detail-footer">
+          <span class="caps muted">Vista de sólo lectura</span>
+          <span class="sub">Las respuestas se envían desde las apps oficiales por ahora.</span>
+        </footer>
+      } @else {
+        <div class="conv-empty large">
+          @if (loading()) { Cargando inbox… }
+          @else if (data()) { Seleccioná una conversación de la izquierda }
+          @else { Cargando inbox… }
+        </div>
+      }
+    </section>
+
+  </div>
+</main>
