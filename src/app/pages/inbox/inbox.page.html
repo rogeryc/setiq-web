@@ -40,7 +40,10 @@
                         [class.high]="c.priority === 'high' || c.priority === 'urgent'"
                         [class.med]="c.priority === 'medium'"
                         [class.low]="c.priority === 'low'"></span>
-                  <span class="ch-tag">{{ channelShort(c.channel) }}</span>
+                  <span class="ch-avatar" [class]="'ch-avatar ' + channelKey(c.channel)"
+                        [title]="channelShort(c.channel)">
+                    <app-icon [name]="channelIcon(c.channel)" [size]="14" />
+                  </span>
                   <div class="body">
                     <div class="top">
                       <span class="name">{{ c.contact_name || c.contact_handle }}</span>

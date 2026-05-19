@@ -1,6 +1,8 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 
+import { IconComponent } from '../../core/icons/icon';
+import { IconName } from '../../core/icons/icon-set';
 import { ConversationsService } from '../../core/api/conversations.service';
 import {
   ApiConversationDetail,
@@ -28,7 +30,7 @@ const RELATIVE_FORMAT = new Intl.RelativeTimeFormat('es-BO', { numeric: 'auto' }
 
 @Component({
   selector: 'app-inbox-page',
-  imports: [],
+  imports: [IconComponent],
   templateUrl: './inbox.page.html',
   styleUrl: './inbox.page.scss',
 })
@@ -107,6 +109,25 @@ export class InboxPage implements OnInit {
       case 'web':               return 'Web';
       default:                  return channel;
     }
+  }
+
+  /** Map a conversation.channel (e.g. instagram_dm) → IconName for <app-icon>. */
+  channelIcon(channel: string): IconName {
+    if (channel.startsWith('instagram')) return 'instagram';
+    if (channel.startsWith('facebook'))  return 'facebook';
+    if (channel.startsWith('tiktok'))    return 'tiktok';
+    if (channel === 'email')             return 'email';
+    return 'email'; // fallback for web/whatsapp until we add those icons
+  }
+
+  /** Platform key for brand-color CSS class on the channel avatar. */
+  channelKey(channel: string): string {
+    if (channel.startsWith('instagram')) return 'instagram';
+    if (channel.startsWith('facebook'))  return 'facebook';
+    if (channel.startsWith('tiktok'))    return 'tiktok';
+    if (channel === 'email')             return 'email';
+    if (channel === 'whatsapp')          return 'whatsapp';
+    return 'web';
   }
 
   sentimentTone(sentiment: string | undefined): 'pos' | 'neg' | 'neutral' | '' {

@@ -80,15 +80,27 @@
   color: var(--soft);
 }
 
-.ch-tag {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--card-2);
-  color: var(--muted);
-  letter-spacing: 0.04em;
-  white-space: nowrap;
+// Brand-colored circular avatar containing the platform icon. Replaces the
+// old text tag — the specific sub-type (DM vs comment) stays in the title
+// attribute (hover tooltip) and is implicit via the grouping toggle.
+.ch-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--rule-strong);
+  background: var(--card);
+  flex-shrink: 0;
+  transition: border-color 100ms;
+
+  &.instagram { color: #E1306C; border-color: rgba(225, 48, 108, 0.30); }
+  &.facebook  { color: #1877F2; border-color: rgba(24, 119, 242, 0.32); }
+  &.tiktok    { color: #25F4EE; border-color: rgba(37, 244, 238, 0.28); }
+  &.email     { color: #C9CFDB; }
+  &.whatsapp  { color: #25D366; border-color: rgba(37, 211, 102, 0.32); }
+  &.web       { color: var(--muted); }
 }
 
 .s-conv {
@@ -101,8 +113,13 @@
     border: 1px solid var(--rule);
   }
 
-  .ch-tag {
+  .ch-avatar {
     margin-right: 4px;
+  }
+
+  &.active .ch-avatar,
+  &:hover .ch-avatar {
+    border-color: currentColor;
   }
 }
 
