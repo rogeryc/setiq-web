@@ -1,22 +1,14 @@
-import { DecimalPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { DecimalPipe, isPlatformBrowser } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { OverviewService } from '../../core/api/overview.service';
+import { ApiOverviewResponse } from '../../core/api/types';
 import { ChartCardComponent } from '../../shared/chart-card/chart-card';
 import { DonutChartComponent, DonutSegment } from '../../shared/donut-chart/donut-chart';
 import { FeaturedRecCardComponent, RecAction } from '../../shared/featured-rec-card/featured-rec-card';
-import { KpiCardComponent, KpiDelta } from '../../shared/kpi-card/kpi-card';
+import { KpiCardComponent } from '../../shared/kpi-card/kpi-card';
 import { MemoAction, MemoCardComponent, MemoSeverity } from '../../shared/memo-card/memo-card';
-
-interface KpiViewModel {
-  label: string;
-  value: string;
-  unit?: string;
-  delta?: KpiDelta;
-  sub?: string;
-  spark?: number[];
-  sparkTone?: KpiDelta['tone'];
-}
 
 interface MemoViewModel {
   severity: MemoSeverity;
@@ -28,6 +20,15 @@ interface MemoViewModel {
   actions?: MemoAction[];
   footnote?: string;
 }
+
+const CHANNEL_COLORS: Record<string, string> = {
+  instagram: '#E1306C',
+  facebook: '#1877F2',
+  tiktok: '#000000',
+  email: '#6E6E6E',
+  whatsapp: '#25D366',
+  web: '#9CA3AF',
+};
 
 @Component({
   selector: 'app-overview-page',
@@ -43,42 +44,34 @@ interface MemoViewModel {
   templateUrl: './overview.page.html',
   styleUrl: './overview.page.scss',
 })
-export class OverviewPage {
-  // Placeholder data — drop-in target for an API service later.
+export class OverviewPage implements OnInit {
+  private readonly overviewService = inject(OverviewService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+  protected readonly data = signal<ApiOverviewResponse | null>(null);
+  protected readonly error = signal<string | null>(null);
+
+  // Derived view-models from the API response. Stay static for content
+  // we haven't wired yet (lead copy, featured rec, memos).
+  protected readonly channelDonut = computed<DonutSegment[]>(() => {
+    const slices = this.data()?.channel_distribution ?? [];
+    return slices.map((s) => ({
+      label: s.label,
+      value: s.value,
+      color: CHANNEL_COLORS[s.key] ?? '#9CA3AF',
+    }));
+  });
+
+  protected readonly channelTotal = computed<string>(() => {
+    const total = this.data()?.channel_total ?? 0;
+    return total.toLocaleString('es-AR');
+  });
+
+  // Static placeholders until backend exposes recommendations/memos.
   readonly leadHeadline = 'Thalma está siendo escuchada.';
   readonly leadHeadlineEm = 'Y empezando a pedir cosas.';
   readonly leadCopy =
     'Sentimiento estable salvo después de la nota del lunes en Rosario, donde un sector concentró críticas. La audiencia de TikTok empuja una serie sobre vivienda — la oportunidad tiene 3 meses.';
-
-  readonly kpis: KpiViewModel[] = [
-    {
-      label: 'Interacciones',
-      value: '2.614',
-      delta: { label: '↑ 12%', tone: 'pos' },
-      sub: 'vs mes anterior',
-    },
-    {
-      label: 'Sentimiento',
-      value: '0,68',
-      delta: { label: '↓ 4 pp', tone: 'neg' },
-      sub: 'esta semana',
-      spark: [12, 14, 11, 9, 13, 15, 14, 12, 14, 18, 22, 26, 22, 19],
-      sparkTone: 'neg',
-    },
-    {
-      label: 'Sin resolver',
-      value: '41',
-      delta: { label: '12 altas', tone: 'warn' },
-      sub: 'prioridad de servicio',
-    },
-    {
-      label: 'TMR · Kaizen',
-      value: '18',
-      unit: 'min',
-      delta: { label: 'SLA', tone: 'pos' },
-      sub: 'objetivo < 30min',
-    },
-  ];
 
   readonly featuredRec = {
     title: 'La nota sobre vivienda está disparando',
@@ -95,13 +88,6 @@ export class OverviewPage {
       { label: 'Asignar a Sole', variant: 'ghost' as const },
     ] satisfies RecAction[],
   };
-
-  readonly channelDonut: DonutSegment[] = [
-    { label: 'Instagram', value: 1184, color: '#E1306C' },
-    { label: 'Facebook', value: 612, color: '#1877F2' },
-    { label: 'TikTok', value: 487, color: '#000000' },
-    { label: 'Email', value: 331, color: '#6E6E6E' },
-  ];
 
   readonly memos: MemoViewModel[] = [
     {
@@ -140,6 +126,19 @@ export class OverviewPage {
     },
   ];
 
-  readonly channelTotal = '2.614';
-  readonly topGrowthChannel = 'TikTok +28%';
+  readonly topGrowthChannel = computed(
+    () => this.data()?.top_growth_channel ?? '—',
+  );
+
+  async ngOnInit(): Promise<void> {
+    // Browser-only: SSR has no auth context, so the request would 401.
+    // The client picks up after hydration and fetches real data.
+    if (!this.isBrowser) return;
+    try {
+      const data = await this.overviewService.getOverview();
+      this.data.set(data);
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : String(e));
+    }
+  }
 }
