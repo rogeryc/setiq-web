@@ -16,9 +16,9 @@ export interface KpiDelta {
 export class KpiCardComponent {
   readonly label = input.required<string>();
   readonly value = input.required<string>();
-  readonly delta = input<KpiDelta | null>(null);
-  readonly sub = input<string | null>(null);
-  readonly unit = input<string | null>(null);
-  readonly spark = input<number[] | null>(null);
+  readonly delta = input<KpiDelta>();
+  readonly sub = input<string>();
+  readonly unit = input<string>();
+  readonly spark = input<number[]>();
   readonly sparkTone = input<ChipTone>('neutral');
 }

@@ -12,11 +12,11 @@ export interface ApiKpiDelta {
 export interface ApiKpi {
   label: string;
   value: string;
-  unit: string | null;
-  delta: ApiKpiDelta | null;
-  sub: string | null;
-  spark: number[] | null;
-  spark_tone: ApiTone | null;
+  unit?: string;
+  delta?: ApiKpiDelta;
+  sub?: string;
+  spark?: number[];
+  spark_tone?: ApiTone;
 }
 
 export interface ApiChannelSlice {
@@ -27,45 +27,45 @@ export interface ApiChannelSlice {
 
 export interface ApiInsightAction {
   label: string;
-  route: string | null;
-  variant: 'acc' | 'ghost' | null;
+  route?: string;
+  variant?: 'acc' | 'ghost';
 }
 
 export interface ApiLeadCopy {
   title: string;
-  title_em: string | null;
+  title_em?: string;
   body: string;
 }
 
 export interface ApiFeaturedRec {
   title: string;
-  title_em: string | null;
-  title_tail: string | null;
+  title_em?: string;
+  title_tail?: string;
   body: string;
-  confidence: string | null;
-  age: string | null;
-  impact: string | null;
+  confidence?: string;
+  age?: string;
+  impact?: string;
   actions: ApiInsightAction[];
 }
 
 export interface ApiMemo {
   severity: 'low' | 'med' | 'high';
   tag: string;
-  confidence: string | null;
+  confidence?: string;
   title: string;
-  title_em: string | null;
+  title_em?: string;
   body: string;
   actions: ApiInsightAction[];
-  footnote: string | null;
+  footnote?: string;
 }
 
 export interface ApiOverviewResponse {
   kpis: ApiKpi[];
   channel_distribution: ApiChannelSlice[];
   channel_total: number;
-  top_growth_channel: string | null;
-  lead: ApiLeadCopy | null;
-  featured_recommendation: ApiFeaturedRec | null;
+  top_growth_channel?: string;
+  lead?: ApiLeadCopy;
+  featured_recommendation?: ApiFeaturedRec;
   memos: ApiMemo[];
 }
 

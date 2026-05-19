@@ -73,5 +73,5 @@ import { IconName } from './icon-set';
 export class IconComponent {
   readonly name = input.required<IconName>();
   readonly size = input(16);
-  readonly ariaLabel = input<string | null>(null);
+  readonly ariaLabel = input<string>();
 }

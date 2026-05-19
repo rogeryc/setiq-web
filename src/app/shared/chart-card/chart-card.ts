@@ -24,5 +24,5 @@ import { Component, input } from '@angular/core';
 })
 export class ChartCardComponent {
   readonly title = input.required<string>();
-  readonly meta = input<string | null>(null);
+  readonly meta = input<string>();
 }

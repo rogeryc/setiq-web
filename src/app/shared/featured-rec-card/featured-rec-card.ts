@@ -5,8 +5,8 @@ import { IconComponent } from '../../core/icons/icon';
 
 export interface RecAction {
   label: string;
-  route?: string | null;   // if set → renders as routerLink
-  variant?: 'acc' | 'ghost' | null;
+  route?: string;          // if set → renders as routerLink
+  variant?: 'acc' | 'ghost';
 }
 
 @Component({
@@ -16,11 +16,11 @@ export interface RecAction {
 })
 export class FeaturedRecCardComponent {
   readonly title = input.required<string>();
-  readonly titleEm = input<string | null>(null);
-  readonly titleTail = input<string | null>(null);
+  readonly titleEm = input<string>();
+  readonly titleTail = input<string>();
   readonly body = input.required<string>();
-  readonly confidence = input<string | null>(null);
-  readonly age = input<string | null>(null);
-  readonly impact = input<string | null>(null);
+  readonly confidence = input<string>();
+  readonly age = input<string>();
+  readonly impact = input<string>();
   readonly actions = input<RecAction[]>([]);
 }

@@ -40,7 +40,7 @@ interface DonutArc {
 export class DonutChartComponent {
   readonly segments = input.required<DonutSegment[]>();
   readonly centerValue = input.required<string>();
-  readonly centerLabel = input<string | null>(null);
+  readonly centerLabel = input<string>();
 
   private readonly OUTER = 66;
   private readonly INNER = 47;
