@@ -1,0 +1,21 @@
+<header class="s-mast">
+  <span class="s-mark">setiq<em>.</em></span>
+  <button class="s-tenant" type="button">
+    <span class="dot"></span>{{ tenantLabel }}
+    <app-icon name="chevron-down" [size]="12" />
+  </button>
+  <div class="s-mast-spacer"></div>
+  <div class="s-mast-meta">
+    <span>{{ nowLabel }}</span>
+    <button class="s-search" type="button">
+      <app-icon name="search" [size]="14" />
+      <span>Buscar conversaciones, segmentos…</span>
+      <kbd>⌘K</kbd>
+    </button>
+    <button class="s-avatar" type="button" aria-label="Cuenta">{{ userInitials }}</button>
+    <button type="button" class="s-btn ghost" style="padding:6px 10px"
+            title="Cambiar tema" (click)="theme.toggle()">
+      <app-icon name="theme" [size]="14" />
+    </button>
+  </div>
+</header>

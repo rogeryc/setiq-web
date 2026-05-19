@@ -1,0 +1,17 @@
+<article class="s-kpi-card">
+  <span class="caps muted">{{ label() }}</span>
+  <div class="s-kpi-row">
+    <span class="v num">
+      {{ value() }}@if (unit(); as u) {<sup>{{ u }}</sup>}
+    </span>
+    @if (delta(); as d) {
+      <app-delta-chip [label]="d.label" [tone]="d.tone" />
+    }
+  </div>
+  @if (sub(); as s) {
+    <span class="sub">{{ s }}</span>
+  }
+  @if (spark(); as pts) {
+    <app-sparkline [points]="pts" [tone]="sparkTone()" />
+  }
+</article>

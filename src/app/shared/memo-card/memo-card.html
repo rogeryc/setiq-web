@@ -1,0 +1,27 @@
+<article class="s-memo">
+  <div class="meta">
+    <span class="sev" [class.low]="severity() === 'low'" [class.med]="severity() === 'med'" [class.high]="severity() === 'high'"></span>
+    <span class="tag">{{ tag() }}</span>
+    @if (confidence(); as c) {
+      <span class="num">{{ c }}</span>
+    }
+  </div>
+  <h3>
+    {{ title() }}@if (titleEm(); as e) { <em>{{ e }}</em>}
+  </h3>
+  <p class="body" style="font-size:13px">{{ body() }}</p>
+  @if (actions().length || footnote()) {
+    <div class="actions">
+      @for (a of actions(); track a.label) {
+        <button type="button" class="s-btn"
+                [class.acc]="a.variant === 'acc'"
+                [class.ghost]="a.variant === 'ghost'">
+          {{ a.label }}
+        </button>
+      }
+      @if (footnote(); as f) {
+        <span class="conf">{{ f }}</span>
+      }
+    </div>
+  }
+</article>

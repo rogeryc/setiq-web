@@ -1,0 +1,10 @@
+<nav class="s-nav" aria-label="Secciones">
+  @for (item of items; track item.route) {
+    <a [routerLink]="item.route"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: item.exact ?? false }">
+      {{ item.label }}
+    </a>
+  }
+  <span class="module">Módulo<span class="pill">{{ activeModule }}</span></span>
+</nav>

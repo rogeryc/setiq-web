@@ -1,0 +1,37 @@
+<article class="s-feature-rec">
+  <div class="top">
+    <div class="star" aria-hidden="true">
+      <app-icon name="star" [size]="16" />
+    </div>
+    <span class="lbl">Recomendación destacada</span>
+    @if (confidence() || age()) {
+      <span class="meta">
+        @if (confidence(); as c) { Confianza {{ c }} }
+        @if (confidence() && age()) { · }
+        @if (age(); as a) { {{ a }} }
+      </span>
+    }
+  </div>
+  <h2>
+    {{ title() }}@if (titleEm(); as e) { <em>{{ e }}</em>}@if (titleTail(); as t) { {{ t }}}
+  </h2>
+  <p>{{ body() }}</p>
+  @if (actions().length || impact()) {
+    <div class="actions">
+      @for (a of actions(); track a.label) {
+        @if (a.route) {
+          <a [routerLink]="a.route" class="s-btn"
+             [class.acc]="a.variant === 'acc'"
+             [class.ghost]="a.variant === 'ghost'">{{ a.label }}</a>
+        } @else {
+          <button type="button" class="s-btn"
+                  [class.acc]="a.variant === 'acc'"
+                  [class.ghost]="a.variant === 'ghost'">{{ a.label }}</button>
+        }
+      }
+      @if (impact(); as im) {
+        <span class="imp">{{ im }}</span>
+      }
+    </div>
+  }
+</article>

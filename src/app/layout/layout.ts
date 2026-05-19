@@ -1,11 +1,13 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 import { ThemeService } from '../core/theme.service';
+import { MastheadComponent } from './masthead/masthead';
+import { NavTabsComponent } from './nav-tabs/nav-tabs';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterOutlet, MastheadComponent, NavTabsComponent],
   templateUrl: './layout.html',
 })
 export class LayoutComponent {
