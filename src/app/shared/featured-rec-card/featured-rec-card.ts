@@ -5,8 +5,8 @@ import { IconComponent } from '../../core/icons/icon';
 
 export interface RecAction {
   label: string;
-  route?: string;          // if set → renders as routerLink
-  variant?: 'acc' | 'ghost';
+  route?: string | null;   // if set → renders as routerLink
+  variant?: 'acc' | 'ghost' | null;
 }
 
 @Component({

@@ -4,7 +4,7 @@ export type MemoSeverity = 'low' | 'med' | 'high';
 
 export interface MemoAction {
   label: string;
-  variant?: 'acc' | 'ghost' | 'default';
+  variant?: 'acc' | 'ghost' | 'default' | null;
 }
 
 @Component({
