@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import { AjustesPage } from './pages/ajustes/ajustes.page';
 import { ChannelsPage } from './pages/channels/channels.page';
 import { EquipoPage } from './pages/equipo/equipo.page';
 import { InboxPage } from './pages/inbox/inbox.page';
@@ -19,8 +20,7 @@ export const routes: Routes = [
       { path: 'segmentos', component: SegmentosPage },
       { path: 'recomendaciones', component: RecomendacionesPage },
       { path: 'equipo', component: EquipoPage },
-      // Placeholders for the remaining handoff pages — wire as we build them.
-      { path: 'ajustes', component: OverviewPage },
+      { path: 'ajustes', component: AjustesPage },
     ],
   },
 ];

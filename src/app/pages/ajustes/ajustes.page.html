@@ -1,0 +1,84 @@
+<main class="s-main">
+  <div class="s-admin">
+
+    <!-- Reused admin sidebar pattern from /canales -->
+    <aside class="s-admin-side">
+      <span class="caps">Administración</span>
+      <button type="button" routerLink="/canales">Canales conectados<span class="sub">4 activos</span></button>
+      <button type="button" routerLink="/equipo">Equipo<span class="sub">5 miembros</span></button>
+      <button type="button" class="active">Inquilino y módulos<span class="sub">Core + Kaizen</span></button>
+      <button type="button">Facturación<span class="sub">próximamente</span></button>
+      <button type="button">Webhooks y API<span class="sub">próximamente</span></button>
+      <button type="button">Registro de auditoría<span class="sub">próximamente</span></button>
+    </aside>
+
+    <section class="s-admin-main">
+      <h1>Inquilino y módulos</h1>
+      <p class="lede">
+        Plan, identidad, política de IA y configuración interna del inquilino.
+        Hoy esta pantalla es <em>mayormente visual</em> — los cambios todavía
+        no se persisten. Es el mapa de lo que vamos a hacer editable.
+      </p>
+
+      <div class="s-set-grid aj-grid">
+        @for (card of cards; track card.title) {
+          <article class="s-set-card aj-card" [class.future]="card.future">
+            <header class="aj-card-head">
+              <h3>{{ card.title }}</h3>
+              @if (card.future) {
+                <span class="aj-future-tag">Próximamente</span>
+              }
+            </header>
+            @if (card.description) {
+              <p class="s">{{ card.description }}</p>
+            }
+            @for (row of card.rows; track row.label) {
+              <div class="s-set-row aj-row">
+                <div class="lab">
+                  <span>{{ row.label }}</span>
+                  @if (row.sub) { <span class="s2">{{ row.sub }}</span> }
+                </div>
+
+                @switch (row.control) {
+                  @case ('status') {
+                    <span class="s-status"
+                          [class.ok]="row.status === 'ok'"
+                          [class.warn]="row.status === 'warn'"
+                          [class.off]="row.status === 'off'">
+                      <span class="d"></span>{{ row.value }}
+                    </span>
+                  }
+                  @case ('button') {
+                    <button type="button" class="s-btn ghost" (click)="noop()">
+                      {{ row.buttonLabel }}
+                    </button>
+                  }
+                  @case ('toggle') {
+                    <span class="s-sw" [class.on]="row.toggleOn" role="switch"
+                          [attr.aria-checked]="row.toggleOn"></span>
+                  }
+                  @case ('input') {
+                    <input class="s-input" type="text" [value]="row.value || ''" readonly />
+                  }
+                  @default {
+                    <span class="aj-row-value">{{ row.value }}</span>
+                  }
+                }
+              </div>
+            }
+            @if (card.footnote) {
+              <p class="aj-footnote">{{ card.footnote }}</p>
+            }
+          </article>
+        }
+      </div>
+
+      <p class="aj-bottom-note">
+        <b>Notas:</b> los toggles e inputs son visuales por ahora. Los
+        endpoints PATCH (<code>/tenants/me/settings</code>, <code>/tenants/me/modules</code>)
+        están en la TODO list y se conectan acá cuando se construyan.
+      </p>
+    </section>
+
+  </div>
+</main>
