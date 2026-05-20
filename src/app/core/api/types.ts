@@ -190,6 +190,25 @@ export interface ApiInsightsResponse {
   counts: Partial<Record<InsightKind, number>>;
 }
 
+export type TeamRole = 'admin' | 'agent' | 'viewer';
+
+export interface ApiTeamMember {
+  id: string;
+  email: string;
+  name: string;
+  role: TeamRole;
+  initials: string;
+  joined_at: string;
+  last_login_at?: string;
+  is_superadmin: boolean;
+}
+
+export interface ApiTeamResponse {
+  members: ApiTeamMember[];
+  count_by_role: Partial<Record<TeamRole, number>>;
+  total: number;
+}
+
 export interface ApiTrackedSubject {
   id: string;
   kind: SubjectKind;

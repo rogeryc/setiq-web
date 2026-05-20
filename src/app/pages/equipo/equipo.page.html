@@ -1,0 +1,93 @@
+<main class="s-main">
+  <div class="s-wrap">
+
+    <section class="s-hero eq-hero">
+      <div class="s-hero-lead">
+        <div>
+          <span class="caps">Equipo · Administración</span>
+          <h1>Quién tiene acceso a SETIQ.</h1>
+        </div>
+        <p class="lede">
+          Cada miembro tiene un rol que define qué puede ver y hacer. Los
+          <em>admins</em> manejan ajustes y facturación; los <em>agentes</em>
+          trabajan el inbox; los <em>lectores</em> sólo consumen dashboards.
+        </p>
+      </div>
+      <div class="eq-stats">
+        @if (data(); as d) {
+          <article class="eq-stat">
+            <span class="caps muted">Miembros</span>
+            <div class="v num">{{ d.total }}</div>
+            <span class="sub">con acceso activo</span>
+          </article>
+          <article class="eq-stat">
+            <span class="caps muted">Admins</span>
+            <div class="v num">{{ d.count_by_role.admin ?? 0 }}</div>
+            <span class="sub">control total</span>
+          </article>
+          <article class="eq-stat">
+            <span class="caps muted">Agentes</span>
+            <div class="v num">{{ d.count_by_role.agent ?? 0 }}</div>
+            <span class="sub">trabajan el inbox</span>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="s-section">
+      <header class="s-secthead">
+        <h2>Miembros</h2>
+        <span class="sub">El nivel de acceso se puede cambiar en cualquier momento.</span>
+        <span class="right">
+          <button type="button" class="s-btn acc">+ Invitar persona</button>
+        </span>
+      </header>
+
+      @if (data()) {
+        <div class="eq-filterbar">
+          @for (opt of filterOptions(); track opt.key) {
+            <button type="button"
+                    class="eq-filterbtn"
+                    [class.active]="filter() === opt.key"
+                    [disabled]="opt.count === 0 && opt.key !== 'all'"
+                    (click)="setFilter(opt.key)">
+              {{ opt.label }}
+              <span class="eq-filterbtn-count">{{ opt.count }}</span>
+            </button>
+          }
+        </div>
+
+        <div class="eq-grid">
+          @for (m of filteredMembers(); track m.id) {
+            <article class="eq-card" [attr.data-role]="m.role">
+              <header class="eq-card-head">
+                <div class="eq-avatar" [attr.data-role]="m.role">{{ m.initials }}</div>
+                <div class="eq-card-id">
+                  <div class="eq-name">{{ m.name }}</div>
+                  <div class="eq-email">{{ m.email }}</div>
+                </div>
+                <span class="eq-role" [attr.data-role]="m.role">{{ roleLabel(m.role) }}</span>
+              </header>
+              <p class="eq-role-desc">{{ roleDescription(m.role) }}</p>
+              <footer class="eq-card-foot">
+                <span class="eq-meta">
+                  <span class="caps muted">Último login</span>
+                  <b>{{ formatLastLogin(m.last_login_at) }}</b>
+                </span>
+                <span class="eq-meta">
+                  <span class="caps muted">Se sumó</span>
+                  <b>{{ formatJoinedAt(m.joined_at) }}</b>
+                </span>
+              </footer>
+            </article>
+          }
+        </div>
+      } @else if (error()) {
+        <div class="eq-empty error">Error: {{ error() }}</div>
+      } @else {
+        <div class="eq-empty">Cargando equipo…</div>
+      }
+    </section>
+
+  </div>
+</main>
