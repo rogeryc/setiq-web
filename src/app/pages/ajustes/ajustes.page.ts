@@ -51,7 +51,7 @@ export class AjustesPage {
         },
         {
           label: 'Voice 0800',
-          sub: 'Transcripción y análisis de llamadas — disponible para ITALSA',
+          sub: 'Transcripción y análisis de llamadas (addon)',
           control: 'button', buttonLabel: 'Solicitar',
         },
         {
