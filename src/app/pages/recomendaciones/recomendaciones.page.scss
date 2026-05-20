@@ -1,0 +1,147 @@
+// Recomendaciones page styles. Builds on .s-wrap / .s-hero / .s-secthead
+// from setiq.css and adds the stat strip, filter pills, and grids that
+// hold the existing FeaturedRecCard / MemoCard components.
+
+:host { display: contents; }
+
+.rec-hero {
+  .rec-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+
+    .rec-stat {
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      padding: 12px 14px;
+
+      .v {
+        font-size: 28px;
+        line-height: 1.1;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 4px 0 2px;
+      }
+      .sub {
+        font-size: 11px;
+        color: var(--muted);
+      }
+    }
+  }
+}
+
+.rec-filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 16px 0 4px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 8px 0;
+  background: linear-gradient(var(--bg) 70%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.rec-filterbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  background: var(--card);
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 80ms, background 80ms, border-color 80ms;
+
+  &:hover:not(:disabled) {
+    color: var(--ink);
+    border-color: var(--acc-bright);
+  }
+
+  &.active {
+    background: var(--acc-soft);
+    border-color: var(--acc-bright);
+    color: var(--acc-bright);
+    font-weight: 600;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.rec-filterbtn-count {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--card-2);
+  color: var(--muted);
+
+  .rec-filterbtn.active & {
+    background: var(--acc-bright);
+    color: var(--bg);
+  }
+}
+
+.rec-lead {
+  margin-top: 20px;
+  padding: 18px 20px;
+  border: 1px solid var(--rule);
+  background: var(--card);
+  border-radius: 14px;
+
+  .caps {
+    color: var(--acc-bright);
+  }
+  h2 {
+    margin: 6px 0 8px;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  h2 em {
+    color: var(--acc-bright);
+    font-style: normal;
+  }
+  .lede {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+}
+
+.rec-section {
+  margin-top: 24px;
+}
+
+.rec-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.rec-memo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.rec-empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+
+  &.error {
+    color: var(--neg);
+  }
+}

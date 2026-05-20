@@ -164,6 +164,32 @@ export interface ApiChannelsResponse {
 
 export type SubjectKind = 'competitor' | 'brand' | 'keyword' | 'hashtag';
 
+export type InsightKind = 'lead' | 'featured' | 'memo';
+
+export interface ApiInsight {
+  id: string;
+  kind: InsightKind;
+  severity?: 'low' | 'med' | 'high';
+  tag?: string;
+  title: string;
+  title_em?: string;
+  title_tail?: string;
+  body: string;
+  confidence?: string;
+  age?: string;
+  impact?: string;
+  footnote?: string;
+  actions: ApiInsightAction[];
+  rank: number;
+  created_at: string;
+}
+
+export interface ApiInsightsResponse {
+  insights: ApiInsight[];
+  total: number;
+  counts: Partial<Record<InsightKind, number>>;
+}
+
 export interface ApiTrackedSubject {
   id: string;
   kind: SubjectKind;

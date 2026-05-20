@@ -1,0 +1,124 @@
+<main class="s-main">
+  <div class="s-wrap">
+
+    <!-- Hero -->
+    <section class="s-hero rec-hero">
+      <div class="s-hero-lead">
+        <div>
+          <span class="caps">Recomendaciones · Feed completo</span>
+          <h1>Lo que SETIQ te sugiere esta semana.</h1>
+        </div>
+        <p class="lede">
+          Cada recomendación viene de cruzar los mensajes y menciones que
+          procesamos con un modelo que prioriza por urgencia, oportunidad y
+          confianza. El resumen del lunes está al tope; las destacadas son
+          accionables; los memos son contexto que conviene tener cerca.
+        </p>
+      </div>
+      <div class="rec-stats">
+        @if (data(); as d) {
+          <article class="rec-stat">
+            <span class="caps muted">Total</span>
+            <div class="v num">{{ d.total }}</div>
+            <span class="sub">activas</span>
+          </article>
+          <article class="rec-stat">
+            <span class="caps muted">Destacadas</span>
+            <div class="v num">{{ d.counts.featured ?? 0 }}</div>
+            <span class="sub">para esta semana</span>
+          </article>
+          <article class="rec-stat">
+            <span class="caps muted">Memos</span>
+            <div class="v num">{{ d.counts.memo ?? 0 }}</div>
+            <span class="sub">de contexto</span>
+          </article>
+        }
+      </div>
+    </section>
+
+    <!-- Filter -->
+    @if (data()) {
+      <div class="rec-filterbar">
+        @for (opt of filterOptions(); track opt.key) {
+          <button type="button"
+                  class="rec-filterbtn"
+                  [class.active]="filter() === opt.key"
+                  [disabled]="opt.count === 0 && opt.key !== 'all'"
+                  (click)="setFilter(opt.key)">
+            {{ opt.label }}
+            <span class="rec-filterbtn-count">{{ opt.count }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Lead -->
+    @if (lead(); as l) {
+      <section class="rec-lead">
+        <span class="caps">{{ l.tag || 'Resumen ejecutivo · 30 días' }}</span>
+        <h2>
+          {{ l.title }}@if (l.title_em; as e) { <em>{{ e }}</em>}
+        </h2>
+        <p class="lede">{{ l.body }}</p>
+      </section>
+    }
+
+    <!-- Featured cards -->
+    @if (featured().length > 0) {
+      <section class="rec-section">
+        <header class="s-secthead">
+          <h2>Destacadas</h2>
+          <span class="sub">Acciones recomendadas con alta confianza.</span>
+        </header>
+        <div class="rec-featured-grid">
+          @for (rec of featured(); track rec.id) {
+            <app-featured-rec-card
+              [title]="rec.title"
+              [titleEm]="rec.title_em"
+              [titleTail]="rec.title_tail"
+              [body]="rec.body"
+              [confidence]="rec.confidence"
+              [age]="rec.age"
+              [impact]="rec.impact"
+              [actions]="rec.actions" />
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Memo grid -->
+    @if (memos().length > 0) {
+      <section class="rec-section">
+        <header class="s-secthead">
+          <h2>Memos</h2>
+          <span class="sub">Patrones y oportunidades que conviene tener cerca.</span>
+        </header>
+        <div class="rec-memo-grid">
+          @for (m of memos(); track m.id) {
+            <app-memo-card
+              [severity]="memoSeverity(m.severity)"
+              [tag]="m.tag || 'Memo'"
+              [confidence]="m.confidence"
+              [title]="m.title"
+              [titleEm]="m.title_em"
+              [body]="m.body"
+              [actions]="m.actions"
+              [footnote]="m.footnote" />
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Empty / loading / error -->
+    @if (!data() && !error()) {
+      <div class="rec-empty">Cargando recomendaciones…</div>
+    }
+    @if (error(); as e) {
+      <div class="rec-empty error">Error: {{ e }}</div>
+    }
+    @if (data() && lead() === null && featured().length === 0 && memos().length === 0) {
+      <div class="rec-empty">No hay recomendaciones en esta vista.</div>
+    }
+
+  </div>
+</main>
