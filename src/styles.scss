@@ -291,7 +291,7 @@
 .s-context .rel-mem b { color: var(--acc-bright); font-weight: 600; }
 
 /* === ADMIN === */
-.s-admin { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: minmax(0, 1fr); height: 100%; overflow: hidden; }
+.s-admin { display: grid; grid-template-columns: 240px 1fr; height: 100%; overflow: hidden; }
 .s-admin-side { border-right: 1px solid var(--rule); padding: 22px 14px; background: var(--bg); overflow-y: auto; }
 .s-admin-side .caps { padding: 4px 10px 10px; display: block; }
 .s-admin-side button { display: block; width: 100%; text-align: left; padding: 9px 12px; font: inherit; font-size: 13px; background: none; border: none; cursor: pointer; color: var(--ink); border-radius: 8px; margin-bottom: 2px; line-height: 1.35; }
