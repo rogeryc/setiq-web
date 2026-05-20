@@ -16,7 +16,10 @@
     {{ title() }}@if (titleEm(); as e) {<em>{{ ' ' + e }}</em>}@if (titleTail(); as t) {<span>{{ ' ' + t }}</span>}
   </h2>
   <p>{{ body() }}</p>
-  @if (actions().length || impact()) {
+  @if (impact(); as im) {
+    <p class="rec-impact">{{ im }}</p>
+  }
+  @if (actions().length) {
     <div class="actions">
       @for (a of actions(); track a.label) {
         @if (a.route) {
@@ -28,9 +31,6 @@
                   [class.acc]="a.variant === 'acc'"
                   [class.ghost]="a.variant === 'ghost'">{{ a.label }}</button>
         }
-      }
-      @if (impact(); as im) {
-        <span class="imp">{{ im }}</span>
       }
     </div>
   }

@@ -13,6 +13,14 @@ export interface RecAction {
   selector: 'app-featured-rec-card',
   imports: [IconComponent, RouterLink],
   templateUrl: './featured-rec-card.html',
+  styles: [`
+    .rec-impact {
+      margin: 4px 0 12px;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+  `],
 })
 export class FeaturedRecCardComponent {
   readonly title = input.required<string>();
