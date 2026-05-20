@@ -13,7 +13,7 @@
     }
   </div>
   <h2>
-    {{ title() }}@if (titleEm(); as e) { <em>{{ e }}</em>}@if (titleTail(); as t) { {{ t }}}
+    {{ title() }}@if (titleEm(); as e) {<em>{{ ' ' + e }}</em>}@if (titleTail(); as t) {<span>{{ ' ' + t }}</span>}
   </h2>
   <p>{{ body() }}</p>
   @if (actions().length || impact()) {

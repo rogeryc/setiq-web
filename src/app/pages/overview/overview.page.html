@@ -8,7 +8,7 @@
           <div>
             <span class="caps">Resumen ejecutivo · 30 días</span>
             <h1>
-              {{ lead.title }}@if (lead.title_em; as e) { <em>{{ e }}</em>}
+              {{ lead.title }}@if (lead.title_em; as e) {<em>{{ ' ' + e }}</em>}
             </h1>
           </div>
           <p class="lede">{{ lead.body }}</p>

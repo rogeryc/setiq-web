@@ -7,7 +7,7 @@
     }
   </div>
   <h3>
-    {{ title() }}@if (titleEm(); as e) { <em>{{ e }}</em>}
+    {{ title() }}@if (titleEm(); as e) {<em>{{ ' ' + e }}</em>}
   </h3>
   <p class="body" style="font-size:13px">{{ body() }}</p>
   @if (actions().length || footnote()) {

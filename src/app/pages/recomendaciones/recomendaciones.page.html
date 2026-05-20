@@ -57,7 +57,7 @@
       <section class="rec-lead">
         <span class="caps">{{ l.tag || 'Resumen ejecutivo · 30 días' }}</span>
         <h2>
-          {{ l.title }}@if (l.title_em; as e) { <em>{{ e }}</em>}
+          {{ l.title }}@if (l.title_em; as e) {<em>{{ ' ' + e }}</em>}
         </h2>
         <p class="lede">{{ l.body }}</p>
       </section>
