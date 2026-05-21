@@ -1,9 +1,5 @@
 // Ajustes page — mostly visual placeholders for now.
 
-// Host has ViewEncapsulation.None, so `:host` won't scope. Target the
-// component selector directly so the page wrapper doesn't break the flex
-// chain coming from `.app` (otherwise `.s-main { flex: 1 }` is inert and
-// the page can't scroll).
 app-ajustes-page { display: contents; }
 
 .aj-grid {

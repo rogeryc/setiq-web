@@ -73,6 +73,23 @@ export interface ApiOverviewResponse {
 export interface ApiTokenResponse {
   access_token: string;
   token_type: string;
+  expires_in_minutes: number;
+}
+
+export interface ApiTenantInfo {
+  id: string;
+  slug: string;
+  name: string;
+  modules: Record<string, unknown>;
+}
+
+export interface ApiUserMe {
+  id: string;
+  email: string;
+  name: string;
+  initials: string;
+  role: 'admin' | 'agent' | 'viewer';
+  tenant: ApiTenantInfo;
 }
 
 export type GroupBy = 'intent' | 'channel' | 'sentiment' | 'thread';

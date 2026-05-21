@@ -1,7 +1,7 @@
 <header class="s-mast">
   <span class="s-mark">setiq<em>.</em></span>
   <button class="s-tenant" type="button">
-    <span class="dot"></span>{{ tenantLabel }}
+    <span class="dot"></span>{{ tenantLabel() }}
     <app-icon name="chevron-down" [size]="12" />
   </button>
   <div class="s-mast-spacer"></div>
@@ -12,7 +12,18 @@
       <span>Buscar conversaciones, segmentos…</span>
       <kbd>⌘K</kbd>
     </button>
-    <button class="s-avatar" type="button" aria-label="Cuenta">{{ userInitials }}</button>
+    <div class="s-mast-user">
+      <button class="s-avatar" type="button" aria-label="Cuenta" (click)="toggleMenu()">{{ userInitials() }}</button>
+      @if (menuOpen()) {
+        <div class="s-mast-menu" role="menu">
+          <div class="s-mast-menu-head">
+            <strong>{{ userName() || 'Usuario' }}</strong>
+            <span>{{ userEmail() }}</span>
+          </div>
+          <button type="button" (click)="logout()">Cerrar sesión</button>
+        </div>
+      }
+    </div>
     <button type="button" class="s-btn ghost" style="padding:6px 10px"
             title="Cambiar tema" (click)="theme.toggle()">
       <app-icon name="theme" [size]="14" />

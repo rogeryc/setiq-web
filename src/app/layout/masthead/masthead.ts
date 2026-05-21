@@ -1,6 +1,8 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
+import { AuthService } from '../../core/api/auth.service';
 import { IconComponent } from '../../core/icons/icon';
+import { MeService } from '../../core/api/me.service';
 import { OverviewService } from '../../core/api/overview.service';
 import { ThemeService } from '../../core/theme.service';
 
@@ -19,15 +21,36 @@ const TIME_FORMAT = new Intl.DateTimeFormat('es-BO', {
   imports: [IconComponent],
   templateUrl: './masthead.html',
 })
-export class MastheadComponent {
+export class MastheadComponent implements OnInit {
   readonly theme = inject(ThemeService);
   private readonly overview = inject(OverviewService);
+  private readonly me = inject(MeService);
+  private readonly auth = inject(AuthService);
 
-  readonly tenantLabel = 'Thalma · Bolivia';
-  readonly userInitials = 'TH';
+  readonly tenantLabel = this.me.tenantLabel;
+  readonly userInitials = this.me.initials;
+  readonly modulesLabel = this.me.modulesLabel;
+  readonly userEmail = computed(() => this.me.me()?.email ?? '');
+  readonly userName = computed(() => this.me.me()?.name ?? '');
+
+  protected readonly menuOpen = signal(false);
 
   readonly nowLabel = computed(() => {
     const at = this.overview.lastFetchedAt();
     return at ? TIME_FORMAT.format(at) : '— actualizando…';
   });
+
+  ngOnInit(): void {
+    this.me.ensureLoaded().catch(() => {/* 401 interceptor will redirect */});
+  }
+
+  toggleMenu(): void {
+    this.menuOpen.update((v) => !v);
+  }
+
+  logout(): void {
+    this.menuOpen.set(false);
+    this.me.reset();
+    this.auth.logout();
+  }
 }
