@@ -36,7 +36,22 @@ app-login-page { display: contents; }
   font-size: 12px;
   color: var(--muted);
 
-  .s-input { width: 100%; padding: 9px 12px; font-size: 13px; }
+  // Override .s-input defaults — on the auth card the default
+  // (background: var(--bg)) is almost identical to the card surface,
+  // so inputs become invisible. Use a clearly lighter surface.
+  .s-input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 13.5px;
+    background: var(--card-2);
+    border-color: var(--rule-strong);
+    color: var(--ink);
+  }
+  .s-input:focus {
+    border-color: var(--acc);
+    box-shadow: 0 0 0 3px var(--acc-soft);
+    background: var(--card-2);
+  }
 }
 
 .login-remember {
