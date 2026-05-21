@@ -9,6 +9,7 @@ import { NavTabsComponent } from './nav-tabs/nav-tabs';
   selector: 'app-layout',
   imports: [RouterOutlet, MastheadComponent, NavTabsComponent],
   templateUrl: './layout.html',
+  styles: [':host { display: contents; }'],
 })
 export class LayoutComponent {
   readonly theme = inject(ThemeService);
