@@ -7,7 +7,7 @@
   <div class="s-mast-spacer"></div>
   <div class="s-mast-meta">
     <span [title]="'Hora local Bolivia. Datos al cargar la página.'">{{ nowLabel() }}</span>
-    <button class="s-search" type="button">
+    <button class="s-search" type="button" (click)="sp.open()">
       <app-icon name="search" [size]="14" />
       <span>Buscar conversaciones, segmentos…</span>
       <kbd>⌘K</kbd>
@@ -29,4 +29,5 @@
       <app-icon name="theme" [size]="14" />
     </button>
   </div>
+  <app-search-palette #sp />
 </header>

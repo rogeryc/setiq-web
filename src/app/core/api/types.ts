@@ -194,6 +194,18 @@ export interface ApiChannelsResponse {
   warning_count: number;
 }
 
+export interface ApiSearchHit {
+  type: 'contact' | 'tracked_subject' | 'conversation';
+  id: string;
+  title: string;
+  subtitle?: string;
+}
+
+export interface ApiSearchResponse {
+  query: string;
+  hits: ApiSearchHit[];
+}
+
 export type SubjectKind = 'competitor' | 'brand' | 'keyword' | 'hashtag';
 
 export type InsightKind = 'lead' | 'featured' | 'memo';

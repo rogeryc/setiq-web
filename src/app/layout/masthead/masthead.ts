@@ -5,6 +5,7 @@ import { IconComponent } from '../../core/icons/icon';
 import { MeService } from '../../core/api/me.service';
 import { OverviewService } from '../../core/api/overview.service';
 import { ThemeService } from '../../core/theme.service';
+import { SearchPaletteComponent } from '../../shared/search-palette/search-palette';
 
 const TIME_FORMAT = new Intl.DateTimeFormat('es-BO', {
   weekday: 'short',
@@ -18,7 +19,7 @@ const TIME_FORMAT = new Intl.DateTimeFormat('es-BO', {
 
 @Component({
   selector: 'app-masthead',
-  imports: [IconComponent],
+  imports: [IconComponent, SearchPaletteComponent],
   templateUrl: './masthead.html',
 })
 export class MastheadComponent implements OnInit {
