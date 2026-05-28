@@ -3,7 +3,7 @@ import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angul
 import { FormsModule } from '@angular/forms';
 
 import { TrackedSubjectsService } from '../../core/api/tracked-subjects.service';
-import { ApiTrackedSubject, ApiTrackedSubjectCreate, SubjectKind } from '../../core/api/types';
+import { ApiTrackedSubject, SubjectKind } from '../../core/api/types';
 
 interface KindSection {
   kind: SubjectKind;
@@ -135,6 +135,8 @@ export class SegmentosPage implements OnInit {
   protected readonly showModal = signal(false);
   protected readonly submitting = signal(false);
   protected readonly formError = signal<string | null>(null);
+  protected readonly editingId = signal<string | null>(null);
+  protected readonly busyId = signal<string | null>(null);
 
   protected readonly fKind = signal<SubjectKind>('competitor');
   protected readonly fLabel = signal('');
@@ -144,7 +146,7 @@ export class SegmentosPage implements OnInit {
   protected readonly fKeywords = signal('');
   protected readonly fHashtags = signal('');
 
-  openModal(): void {
+  private resetForm(): void {
     this.formError.set(null);
     this.fKind.set('competitor');
     this.fLabel.set('');
@@ -153,6 +155,24 @@ export class SegmentosPage implements OnInit {
     this.fFacebook.set('');
     this.fKeywords.set('');
     this.fHashtags.set('');
+  }
+
+  openModal(): void {
+    this.editingId.set(null);
+    this.resetForm();
+    this.showModal.set(true);
+  }
+
+  openEdit(s: ApiTrackedSubject): void {
+    this.editingId.set(s.id);
+    this.formError.set(null);
+    this.fKind.set(s.kind);
+    this.fLabel.set(s.label);
+    this.fInstagram.set(s.handles['instagram'] ?? '');
+    this.fTiktok.set(s.handles['tiktok'] ?? '');
+    this.fFacebook.set(s.handles['facebook'] ?? '');
+    this.fKeywords.set(s.keywords.join(', '));
+    this.fHashtags.set(s.hashtags.join(', '));
     this.showModal.set(true);
   }
 
@@ -175,26 +195,73 @@ export class SegmentosPage implements OnInit {
     if (this.fInstagram().trim()) handles['instagram'] = this.fInstagram().trim();
     if (this.fTiktok().trim()) handles['tiktok'] = this.fTiktok().trim();
     if (this.fFacebook().trim()) handles['facebook'] = this.fFacebook().trim();
-
-    const body: ApiTrackedSubjectCreate = {
-      kind: this.fKind(),
-      label,
-      handles,
-      keywords: this.splitList(this.fKeywords()),
-      hashtags: this.splitList(this.fHashtags()),
-      enabled: true,
-    };
+    const keywords = this.splitList(this.fKeywords());
+    const hashtags = this.splitList(this.fHashtags());
 
     this.submitting.set(true);
     this.formError.set(null);
     try {
-      const created = await this.service.create(body);
-      this.data.update((list) => [created, ...(list ?? [])]);
+      const id = this.editingId();
+      if (id) {
+        const updated = await this.service.update(id, { label, handles, keywords, hashtags });
+        this.data.update((list) =>
+          (list ?? []).map((s) =>
+            s.id === id
+              ? { ...updated, mention_count: s.mention_count, last_mention_at: s.last_mention_at }
+              : s,
+          ),
+        );
+      } else {
+        const created = await this.service.create({
+          kind: this.fKind(),
+          label,
+          handles,
+          keywords,
+          hashtags,
+          enabled: true,
+        });
+        this.data.update((list) => [created, ...(list ?? [])]);
+      }
       this.showModal.set(false);
     } catch (e) {
-      this.formError.set(e instanceof Error ? e.message : 'No se pudo crear el sujeto.');
+      this.formError.set(e instanceof Error ? e.message : 'No se pudo guardar el sujeto.');
     } finally {
       this.submitting.set(false);
+    }
+  }
+
+  async togglePause(s: ApiTrackedSubject): Promise<void> {
+    if (this.busyId()) return;
+    this.busyId.set(s.id);
+    try {
+      const updated = await this.service.update(s.id, { enabled: !s.enabled });
+      this.data.update((list) =>
+        (list ?? []).map((x) =>
+          x.id === s.id
+            ? { ...updated, mention_count: x.mention_count, last_mention_at: x.last_mention_at }
+            : x,
+        ),
+      );
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.busyId.set(null);
+    }
+  }
+
+  async deleteSubject(s: ApiTrackedSubject): Promise<void> {
+    if (this.busyId()) return;
+    if (this.isBrowser && !confirm(`¿Eliminar "${s.label}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+    this.busyId.set(s.id);
+    try {
+      await this.service.remove(s.id);
+      this.data.update((list) => (list ?? []).filter((x) => x.id !== s.id));
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.busyId.set(null);
     }
   }
 }

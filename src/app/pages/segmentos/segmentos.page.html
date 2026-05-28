@@ -100,6 +100,17 @@
                     <span class="sub">·</span>
                     <span class="sub">{{ formatLastMention(s.last_mention_at) }}</span>
                   </footer>
+
+                  <div class="seg-card-actions">
+                    <button type="button" class="seg-act" (click)="openEdit(s)"
+                            [disabled]="busyId() === s.id">Editar</button>
+                    <button type="button" class="seg-act" (click)="togglePause(s)"
+                            [disabled]="busyId() === s.id">
+                      {{ s.enabled ? 'Pausar' : 'Reactivar' }}
+                    </button>
+                    <button type="button" class="seg-act danger" (click)="deleteSubject(s)"
+                            [disabled]="busyId() === s.id">Eliminar</button>
+                  </div>
                 </article>
               }
             </div>
@@ -118,13 +129,14 @@
     <div class="seg-modal-backdrop" (click)="closeModal()">
       <div class="seg-modal" (click)="$event.stopPropagation()">
         <header class="seg-modal-head">
-          <h3>Agregar sujeto</h3>
+          <h3>{{ editingId() ? 'Editar sujeto' : 'Agregar sujeto' }}</h3>
           <button type="button" class="seg-modal-x" (click)="closeModal()" aria-label="Cerrar">×</button>
         </header>
         <form class="seg-form" (ngSubmit)="submit()">
           <label class="seg-field">
             <span>Tipo</span>
-            <select name="kind" [ngModel]="fKind()" (ngModelChange)="fKind.set($event)">
+            <select name="kind" [ngModel]="fKind()" (ngModelChange)="fKind.set($event)"
+                    [disabled]="editingId() !== null">
               <option value="competitor">Competidor</option>
               <option value="brand">Marca propia</option>
               <option value="keyword">Tema (keyword)</option>

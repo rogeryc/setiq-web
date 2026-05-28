@@ -241,6 +241,41 @@
   font-size: 13px;
 }
 
+.seg-card-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.seg-act {
+  flex: 1;
+  background: var(--card-2);
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  padding: 6px 8px;
+  color: var(--ink-2);
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--rule-strong);
+    color: var(--ink);
+  }
+
+  &.danger:hover:not(:disabled) {
+    border-color: var(--warn);
+    color: var(--warn);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
 .seg-modal-backdrop {
   position: fixed;
   inset: 0;

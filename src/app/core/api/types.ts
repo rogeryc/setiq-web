@@ -248,3 +248,11 @@ export interface ApiTrackedSubjectCreate {
   hashtags?: string[];
   enabled?: boolean;
 }
+
+export interface ApiTrackedSubjectUpdate {
+  label?: string;
+  handles?: Record<string, string>;
+  keywords?: string[];
+  hashtags?: string[];
+  enabled?: boolean;
+}
