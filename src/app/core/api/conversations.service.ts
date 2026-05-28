@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
 import {
   ApiConversationDetail,
+  ApiConversationMutation,
   ApiConversationsResponse,
   GroupBy,
 } from './types';
@@ -33,6 +34,16 @@ export class ConversationsService {
         `${API_BASE}/conversations/${id}`,
         params ? { params } : {},
       ),
+    );
+  }
+
+  async update(
+    id: string,
+    body: { status?: string; assigned_user_id?: string },
+  ): Promise<ApiConversationMutation> {
+    await this.auth.ensureLoggedIn();
+    return firstValueFrom(
+      this.http.patch<ApiConversationMutation>(`${API_BASE}/conversations/${id}`, body),
     );
   }
 }

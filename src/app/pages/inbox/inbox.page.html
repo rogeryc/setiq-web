@@ -143,8 +143,26 @@
         </div>
 
         <footer class="s-detail-footer">
-          <span class="caps muted">Vista de sólo lectura</span>
-          <span class="sub">Las respuestas se envían desde las apps oficiales por ahora.</span>
+          <div class="s-detail-actions">
+            <span class="s-conv-status" [class.resolved]="sel.status === 'resolved'">
+              {{ sel.status === 'resolved' ? 'Resuelto' : 'Abierto' }}
+            </span>
+            <button type="button" class="s-btn" (click)="markResolved()"
+                    [disabled]="actionBusy() || sel.status === 'resolved'">
+              Marcar resuelto
+            </button>
+            <select class="s-reassign" [disabled]="actionBusy()"
+                    (change)="reassign($any($event.target).value)">
+              <option value="">Reasignar a…</option>
+              @for (m of members(); track m.id) {
+                <option [value]="m.id">{{ m.name }}</option>
+              }
+            </select>
+            @if (assignedLabel(); as al) {
+              <span class="s-assigned">✓ Asignado a {{ al }}</span>
+            }
+          </div>
+          <span class="sub">Responder se hace desde las apps oficiales por ahora.</span>
         </footer>
       } @else {
         <div class="conv-empty large">

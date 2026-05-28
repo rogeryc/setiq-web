@@ -153,6 +153,12 @@ export interface ApiMessageDetail {
   sender_handle?: string;
 }
 
+export interface ApiConversationMutation {
+  id: string;
+  status: string;
+  assigned_user_id?: string;
+}
+
 export interface ApiConversationDetail {
   id: string;
   contact_name?: string;
