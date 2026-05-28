@@ -1,4 +1,5 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 import { AuthService } from '../../core/api/auth.service';
 import { IconComponent } from '../../core/icons/icon';
@@ -27,6 +28,7 @@ export class MastheadComponent implements OnInit {
   private readonly overview = inject(OverviewService);
   private readonly me = inject(MeService);
   private readonly auth = inject(AuthService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   readonly tenantLabel = this.me.tenantLabel;
   readonly userInitials = this.me.initials;
@@ -42,6 +44,7 @@ export class MastheadComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    if (!this.isBrowser) return;
     this.me.ensureLoaded().catch(() => {/* 401 interceptor will redirect */});
   }
 
