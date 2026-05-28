@@ -1,8 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { TrackedSubjectsService } from '../../core/api/tracked-subjects.service';
-import { ApiTrackedSubject, SubjectKind } from '../../core/api/types';
+import { ApiTrackedSubject, ApiTrackedSubjectCreate, SubjectKind } from '../../core/api/types';
 
 interface KindSection {
   kind: SubjectKind;
@@ -40,7 +41,7 @@ type Filter = SubjectKind | 'all';
 
 @Component({
   selector: 'app-segmentos-page',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './segmentos.page.html',
   styleUrl: './segmentos.page.scss',
 })
@@ -129,5 +130,71 @@ export class SegmentosPage implements OnInit {
 
   handleEntries(handles: Record<string, string>): Array<[string, string]> {
     return Object.entries(handles);
+  }
+
+  protected readonly showModal = signal(false);
+  protected readonly submitting = signal(false);
+  protected readonly formError = signal<string | null>(null);
+
+  protected readonly fKind = signal<SubjectKind>('competitor');
+  protected readonly fLabel = signal('');
+  protected readonly fInstagram = signal('');
+  protected readonly fTiktok = signal('');
+  protected readonly fFacebook = signal('');
+  protected readonly fKeywords = signal('');
+  protected readonly fHashtags = signal('');
+
+  openModal(): void {
+    this.formError.set(null);
+    this.fKind.set('competitor');
+    this.fLabel.set('');
+    this.fInstagram.set('');
+    this.fTiktok.set('');
+    this.fFacebook.set('');
+    this.fKeywords.set('');
+    this.fHashtags.set('');
+    this.showModal.set(true);
+  }
+
+  closeModal(): void {
+    if (!this.submitting()) this.showModal.set(false);
+  }
+
+  private splitList(value: string): string[] {
+    return value.split(',').map((s) => s.trim()).filter(Boolean);
+  }
+
+  async submit(): Promise<void> {
+    if (this.submitting()) return;
+    const label = this.fLabel().trim();
+    if (!label) {
+      this.formError.set('El nombre es obligatorio.');
+      return;
+    }
+    const handles: Record<string, string> = {};
+    if (this.fInstagram().trim()) handles['instagram'] = this.fInstagram().trim();
+    if (this.fTiktok().trim()) handles['tiktok'] = this.fTiktok().trim();
+    if (this.fFacebook().trim()) handles['facebook'] = this.fFacebook().trim();
+
+    const body: ApiTrackedSubjectCreate = {
+      kind: this.fKind(),
+      label,
+      handles,
+      keywords: this.splitList(this.fKeywords()),
+      hashtags: this.splitList(this.fHashtags()),
+      enabled: true,
+    };
+
+    this.submitting.set(true);
+    this.formError.set(null);
+    try {
+      const created = await this.service.create(body);
+      this.data.update((list) => [created, ...(list ?? [])]);
+      this.showModal.set(false);
+    } catch (e) {
+      this.formError.set(e instanceof Error ? e.message : 'No se pudo crear el sujeto.');
+    } finally {
+      this.submitting.set(false);
+    }
   }
 }

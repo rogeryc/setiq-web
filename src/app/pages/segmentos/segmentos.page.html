@@ -34,7 +34,7 @@
         <h2>Sujetos rastreados</h2>
         <span class="sub">Editá la lista cuando quieras — los cambios se propagan al próximo ciclo de scraping.</span>
         <span class="right">
-          <button type="button" class="s-btn acc">+ Agregar sujeto</button>
+          <button type="button" class="s-btn acc" (click)="openModal()">+ Agregar sujeto</button>
         </span>
       </header>
 
@@ -113,4 +113,67 @@
     </section>
 
   </div>
+
+  @if (showModal()) {
+    <div class="seg-modal-backdrop" (click)="closeModal()">
+      <div class="seg-modal" (click)="$event.stopPropagation()">
+        <header class="seg-modal-head">
+          <h3>Agregar sujeto</h3>
+          <button type="button" class="seg-modal-x" (click)="closeModal()" aria-label="Cerrar">×</button>
+        </header>
+        <form class="seg-form" (ngSubmit)="submit()">
+          <label class="seg-field">
+            <span>Tipo</span>
+            <select name="kind" [ngModel]="fKind()" (ngModelChange)="fKind.set($event)">
+              <option value="competitor">Competidor</option>
+              <option value="brand">Marca propia</option>
+              <option value="keyword">Tema (keyword)</option>
+              <option value="hashtag">Hashtag</option>
+            </select>
+          </label>
+          <label class="seg-field">
+            <span>Nombre</span>
+            <input type="text" name="label" placeholder="Ej: Diego Penna"
+                   [ngModel]="fLabel()" (ngModelChange)="fLabel.set($event)" />
+          </label>
+          <div class="seg-field-row">
+            <label class="seg-field">
+              <span>Instagram</span>
+              <input type="text" name="ig" placeholder="@handle"
+                     [ngModel]="fInstagram()" (ngModelChange)="fInstagram.set($event)" />
+            </label>
+            <label class="seg-field">
+              <span>TikTok</span>
+              <input type="text" name="tt" placeholder="@handle"
+                     [ngModel]="fTiktok()" (ngModelChange)="fTiktok.set($event)" />
+            </label>
+            <label class="seg-field">
+              <span>Facebook</span>
+              <input type="text" name="fb" placeholder="page"
+                     [ngModel]="fFacebook()" (ngModelChange)="fFacebook.set($event)" />
+            </label>
+          </div>
+          <label class="seg-field">
+            <span>Keywords (separadas por coma)</span>
+            <input type="text" name="kw" placeholder="decreto, economía"
+                   [ngModel]="fKeywords()" (ngModelChange)="fKeywords.set($event)" />
+          </label>
+          <label class="seg-field">
+            <span>Hashtags (separados por coma)</span>
+            <input type="text" name="hash" placeholder="periodismo, bolivia"
+                   [ngModel]="fHashtags()" (ngModelChange)="fHashtags.set($event)" />
+          </label>
+          @if (formError()) {
+            <p class="seg-form-error">{{ formError() }}</p>
+          }
+          <footer class="seg-modal-foot">
+            <button type="button" class="s-btn ghost" (click)="closeModal()" [disabled]="submitting()">Cancelar</button>
+            <button type="submit" class="s-btn acc" [disabled]="submitting()">
+              {{ submitting() ? 'Guardando…' : 'Agregar' }}
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  }
 </main>

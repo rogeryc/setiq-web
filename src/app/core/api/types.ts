@@ -239,3 +239,12 @@ export interface ApiTrackedSubject {
   mention_count: number;
   last_mention_at?: string;
 }
+
+export interface ApiTrackedSubjectCreate {
+  kind: SubjectKind;
+  label: string;
+  handles?: Record<string, string>;
+  keywords?: string[];
+  hashtags?: string[];
+  enabled?: boolean;
+}

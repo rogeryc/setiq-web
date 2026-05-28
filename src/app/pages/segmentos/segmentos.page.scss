@@ -240,3 +240,112 @@
   color: var(--muted);
   font-size: 13px;
 }
+
+.seg-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.seg-modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--rule-strong);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.seg-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--rule);
+
+  h3 {
+    margin: 0;
+    font-size: 15px;
+    color: var(--ink);
+  }
+}
+
+.seg-modal-x {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+
+  &:hover { color: var(--ink); }
+}
+
+.seg-form {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.seg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+
+  input,
+  select {
+    background: var(--card-2);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 9px 11px;
+    color: var(--ink);
+    font-size: 13px;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: var(--acc-bright);
+    }
+  }
+}
+
+.seg-field-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.seg-form-error {
+  margin: 0;
+  color: var(--warn);
+  font-size: 12px;
+}
+
+.seg-modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+@media (max-width: 560px) {
+  .seg-field-row {
+    grid-template-columns: 1fr;
+  }
+}

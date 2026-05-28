@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from './auth.service';
-import { ApiTrackedSubject } from './types';
+import { ApiTrackedSubject, ApiTrackedSubjectCreate } from './types';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -16,6 +16,13 @@ export class TrackedSubjectsService {
     await this.auth.ensureLoggedIn();
     return firstValueFrom(
       this.http.get<ApiTrackedSubject[]>(`${API_BASE}/tracked-subjects`),
+    );
+  }
+
+  async create(body: ApiTrackedSubjectCreate): Promise<ApiTrackedSubject> {
+    await this.auth.ensureLoggedIn();
+    return firstValueFrom(
+      this.http.post<ApiTrackedSubject>(`${API_BASE}/tracked-subjects`, body),
     );
   }
 }
