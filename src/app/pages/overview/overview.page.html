@@ -61,7 +61,7 @@
         </span>
       </header>
 
-      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-top:20px">
+      <div class="ov-decisions">
         @if (data()?.featured_recommendation; as rec) {
           <app-featured-rec-card
             [title]="rec.title"
@@ -107,7 +107,7 @@
         </app-chart-card>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px">
+      <div class="ov-memos">
         @if (data()?.memos; as memos) {
           @for (m of memos; track m.tag) {
             <app-memo-card
