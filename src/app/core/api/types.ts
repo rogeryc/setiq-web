@@ -70,6 +70,21 @@ export interface ApiOverviewResponse {
   generated_at: string;  // ISO 8601
 }
 
+export interface ApiCompetitorActivity {
+  id: string;
+  label: string;
+  mentions: number;
+  previous: number;
+  delta: number;
+  sentiment_score?: number;
+}
+
+export interface ApiCompetitorActivityResponse {
+  period_days: number;
+  competitors: ApiCompetitorActivity[];
+  generated_at: string;
+}
+
 export interface ApiTokenResponse {
   access_token: string;
   token_type: string;

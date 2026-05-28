@@ -3,7 +3,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from './auth.service';
-import { ApiOverviewResponse } from './types';
+import { ApiCompetitorActivityResponse, ApiOverviewResponse } from './types';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -23,5 +23,14 @@ export class OverviewService {
     );
     this.lastFetchedAt.set(new Date(data.generated_at));
     return data;
+  }
+
+  async getCompetitorActivity(days = 7, limit = 5): Promise<ApiCompetitorActivityResponse> {
+    await this.auth.ensureLoggedIn();
+    return firstValueFrom(
+      this.http.get<ApiCompetitorActivityResponse>(
+        `${API_BASE}/dashboard/competitor-activity?days=${days}&limit=${limit}`,
+      ),
+    );
   }
 }

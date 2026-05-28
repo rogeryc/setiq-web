@@ -3,7 +3,7 @@ import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angul
 import { RouterLink } from '@angular/router';
 
 import { OverviewService } from '../../core/api/overview.service';
-import { ApiOverviewResponse } from '../../core/api/types';
+import { ApiCompetitorActivity, ApiOverviewResponse } from '../../core/api/types';
 import { ChartCardComponent } from '../../shared/chart-card/chart-card';
 import { DonutChartComponent, DonutSegment } from '../../shared/donut-chart/donut-chart';
 import { FeaturedRecCardComponent } from '../../shared/featured-rec-card/featured-rec-card';
@@ -39,6 +39,7 @@ export class OverviewPage implements OnInit {
 
   protected readonly data = signal<ApiOverviewResponse | null>(null);
   protected readonly error = signal<string | null>(null);
+  protected readonly competitors = signal<ApiCompetitorActivity[] | null>(null);
 
   protected readonly channelDonut = computed<DonutSegment[]>(() => {
     const slices = this.data()?.channel_distribution ?? [];
@@ -80,6 +81,12 @@ export class OverviewPage implements OnInit {
       this.data.set(data);
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : String(e));
+    }
+    try {
+      const comp = await this.overviewService.getCompetitorActivity();
+      this.competitors.set(comp.competitors);
+    } catch {
+      this.competitors.set([]);
     }
   }
 }
