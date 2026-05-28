@@ -271,3 +271,35 @@ export interface ApiTrackedSubjectUpdate {
   hashtags?: string[];
   enabled?: boolean;
 }
+
+export interface ApiMentionPreview {
+  id: string;
+  platform: string;
+  author_display_name?: string;
+  author_handle?: string;
+  content_text?: string;
+  content_url?: string;
+  published_at?: string;
+  sentiment?: string;
+}
+
+export interface ApiSentimentBreakdown {
+  positive: number;
+  neutral: number;
+  negative: number;
+}
+
+export interface ApiOverlapContact {
+  id: string;
+  display_name?: string;
+}
+
+export interface ApiTrackedSubjectDetail {
+  id: string;
+  kind: SubjectKind;
+  label: string;
+  mention_count: number;
+  sentiment_breakdown: ApiSentimentBreakdown;
+  recent_mentions: ApiMentionPreview[];
+  audience_overlap: ApiOverlapContact[];
+}

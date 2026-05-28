@@ -67,7 +67,9 @@
                       {{ s.enabled ? 'Activo' : 'Pausado' }}
                     </span>
                   </header>
-                  <h4 class="seg-card-title">{{ s.label }}</h4>
+                  <h4 class="seg-card-title">
+                    <button type="button" class="seg-title-btn" (click)="openDetail(s)">{{ s.label }}</button>
+                  </h4>
 
                   @if (handleEntries(s.handles).length > 0) {
                     <div class="seg-chips">
@@ -185,6 +187,77 @@
             </button>
           </footer>
         </form>
+      </div>
+    </div>
+  }
+
+  @if (showDetail()) {
+    <div class="seg-modal-backdrop" (click)="closeDetail()">
+      <div class="seg-detail" (click)="$event.stopPropagation()">
+        <header class="seg-modal-head">
+          <h3>{{ detail()?.label ?? 'Detalle' }}</h3>
+          <button type="button" class="seg-modal-x" (click)="closeDetail()" aria-label="Cerrar">×</button>
+        </header>
+        <div class="seg-detail-body">
+          @if (detailLoading()) {
+            <p class="seg-detail-muted">Cargando detalle…</p>
+          } @else if (detailError()) {
+            <p class="seg-form-error">{{ detailError() }}</p>
+          } @else if (detail(); as d) {
+            <div class="seg-detail-stat">
+              <span class="num">{{ d.mention_count }}</span>
+              <span class="seg-detail-muted">menciones totales</span>
+            </div>
+
+            <section class="seg-detail-sec">
+              <h4>Sentimiento</h4>
+              <div class="seg-sent-bar">
+                <span class="pos" [style.width.%]="sentimentPct(d, 'positive')"></span>
+                <span class="neu" [style.width.%]="sentimentPct(d, 'neutral')"></span>
+                <span class="neg" [style.width.%]="sentimentPct(d, 'negative')"></span>
+              </div>
+              <div class="seg-sent-legend">
+                <span><i class="dot pos"></i> Positivo {{ d.sentiment_breakdown.positive }}</span>
+                <span><i class="dot neu"></i> Neutral {{ d.sentiment_breakdown.neutral }}</span>
+                <span><i class="dot neg"></i> Negativo {{ d.sentiment_breakdown.negative }}</span>
+              </div>
+            </section>
+
+            <section class="seg-detail-sec">
+              <h4>Menciones recientes</h4>
+              @if (d.recent_mentions.length > 0) {
+                <ul class="seg-mentions">
+                  @for (m of d.recent_mentions; track m.id) {
+                    <li class="seg-mention">
+                      <div class="seg-mention-head">
+                        <span class="seg-mention-author">{{ m.author_display_name || m.author_handle || 'Anónimo' }}</span>
+                        <span class="seg-mention-meta">{{ m.platform }}@if (m.sentiment) { · {{ m.sentiment }} }</span>
+                      </div>
+                      @if (m.content_text) {
+                        <p class="seg-mention-text">{{ m.content_text }}</p>
+                      }
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="seg-detail-muted">Sin menciones todavía.</p>
+              }
+            </section>
+
+            <section class="seg-detail-sec">
+              <h4>Solapamiento de audiencia</h4>
+              @if (d.audience_overlap.length > 0) {
+                <div class="seg-chips">
+                  @for (c of d.audience_overlap; track c.id) {
+                    <span class="seg-chip">{{ c.display_name || 'Contacto' }}</span>
+                  }
+                </div>
+              } @else {
+                <p class="seg-detail-muted">Sin contactos en común detectados todavía.</p>
+              }
+            </section>
+          }
+        </div>
       </div>
     </div>
   }

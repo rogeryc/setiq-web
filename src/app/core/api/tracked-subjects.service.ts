@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import {
   ApiTrackedSubject,
   ApiTrackedSubjectCreate,
+  ApiTrackedSubjectDetail,
   ApiTrackedSubjectUpdate,
 } from './types';
 
@@ -41,6 +42,13 @@ export class TrackedSubjectsService {
     await this.auth.ensureLoggedIn();
     await firstValueFrom(
       this.http.delete<void>(`${API_BASE}/tracked-subjects/${id}`),
+    );
+  }
+
+  async detail(id: string): Promise<ApiTrackedSubjectDetail> {
+    await this.auth.ensureLoggedIn();
+    return firstValueFrom(
+      this.http.get<ApiTrackedSubjectDetail>(`${API_BASE}/tracked-subjects/${id}/detail`),
     );
   }
 }

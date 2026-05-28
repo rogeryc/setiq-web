@@ -3,7 +3,7 @@ import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angul
 import { FormsModule } from '@angular/forms';
 
 import { TrackedSubjectsService } from '../../core/api/tracked-subjects.service';
-import { ApiTrackedSubject, SubjectKind } from '../../core/api/types';
+import { ApiTrackedSubject, ApiTrackedSubjectDetail, SubjectKind } from '../../core/api/types';
 
 interface KindSection {
   kind: SubjectKind;
@@ -263,5 +263,34 @@ export class SegmentosPage implements OnInit {
     } finally {
       this.busyId.set(null);
     }
+  }
+
+  protected readonly showDetail = signal(false);
+  protected readonly detailLoading = signal(false);
+  protected readonly detail = signal<ApiTrackedSubjectDetail | null>(null);
+  protected readonly detailError = signal<string | null>(null);
+
+  async openDetail(s: ApiTrackedSubject): Promise<void> {
+    this.showDetail.set(true);
+    this.detail.set(null);
+    this.detailError.set(null);
+    this.detailLoading.set(true);
+    try {
+      this.detail.set(await this.service.detail(s.id));
+    } catch (e) {
+      this.detailError.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.detailLoading.set(false);
+    }
+  }
+
+  closeDetail(): void {
+    this.showDetail.set(false);
+  }
+
+  sentimentPct(detail: ApiTrackedSubjectDetail, key: 'positive' | 'neutral' | 'negative'): number {
+    const b = detail.sentiment_breakdown;
+    const total = b.positive + b.neutral + b.negative;
+    return total > 0 ? Math.round((b[key] / total) * 100) : 0;
   }
 }
