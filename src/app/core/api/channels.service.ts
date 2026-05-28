@@ -18,4 +18,14 @@ export class ChannelsService {
       this.http.get<ApiChannelsResponse>(`${API_BASE}/channels`),
     );
   }
+
+  async patchModules(
+    key: string,
+    patch: { setiq?: boolean; kaizen?: boolean },
+  ): Promise<ApiChannelsResponse> {
+    await this.auth.ensureLoggedIn();
+    return firstValueFrom(
+      this.http.patch<ApiChannelsResponse>(`${API_BASE}/channels/${key}`, patch),
+    );
+  }
 }

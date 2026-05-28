@@ -70,12 +70,16 @@
               </span>
               <span class="sync">{{ formatLastSync(c.last_sync_at) }}</span>
               <div class="modules">
-                <span class="s-toggle">
+                <button type="button" class="s-toggle"
+                        (click)="toggleModule(c, 'setiq')"
+                        [disabled]="!c.connected || busyKey() === c.key">
                   <span class="s-sw" [class.on]="c.modules.setiq"></span>Core
-                </span>
-                <span class="s-toggle">
+                </button>
+                <button type="button" class="s-toggle"
+                        (click)="toggleModule(c, 'kaizen')"
+                        [disabled]="!c.connected || busyKey() === c.key">
                   <span class="s-sw" [class.on]="c.modules.kaizen"></span>Kaizen
-                </span>
+                </button>
               </div>
             </div>
           }

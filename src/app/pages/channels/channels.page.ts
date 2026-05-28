@@ -33,6 +33,7 @@ export class ChannelsPage implements OnInit {
 
   protected readonly data = signal<ApiChannelsResponse | null>(null);
   protected readonly error = signal<string | null>(null);
+  protected readonly busyKey = signal<string | null>(null);
 
   async ngOnInit(): Promise<void> {
     if (!this.isBrowser) return;
@@ -40,6 +41,20 @@ export class ChannelsPage implements OnInit {
       this.data.set(await this.service.list());
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  async toggleModule(c: ApiChannelStatus, module: 'setiq' | 'kaizen'): Promise<void> {
+    if (!c.connected || this.busyKey()) return;
+    this.busyKey.set(c.key);
+    try {
+      const next = !c.modules[module];
+      const patch = module === 'setiq' ? { setiq: next } : { kaizen: next };
+      this.data.set(await this.service.patchModules(c.key, patch));
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.busyKey.set(null);
     }
   }
 
