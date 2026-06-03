@@ -34,7 +34,7 @@
         <h2>Sujetos rastreados</h2>
         <span class="sub">Editá la lista cuando quieras — los cambios se propagan al próximo ciclo de scraping.</span>
         <span class="right">
-          <button type="button" class="s-btn acc">+ Agregar sujeto</button>
+          <button type="button" class="s-btn acc" (click)="openCreate()">+ Agregar sujeto</button>
         </span>
       </header>
 
@@ -66,6 +66,22 @@
                     <span class="seg-state" [class.on]="s.enabled">
                       {{ s.enabled ? 'Activo' : 'Pausado' }}
                     </span>
+                    <div class="seg-menu-wrap">
+                      <button type="button"
+                              class="seg-menu-btn"
+                              aria-label="Acciones"
+                              [disabled]="pendingId() === s.id"
+                              (click)="toggleMenu(s.id)">⋯</button>
+                      @if (openMenuId() === s.id) {
+                        <div class="seg-menu" role="menu">
+                          <button type="button" (click)="openEdit(s)">Editar</button>
+                          <button type="button" (click)="togglePause(s)">
+                            {{ s.enabled ? 'Pausar' : 'Activar' }}
+                          </button>
+                          <button type="button" class="danger" (click)="askDelete(s)">Eliminar</button>
+                        </div>
+                      }
+                    </div>
                   </header>
                   <h4 class="seg-card-title">{{ s.label }}</h4>
 
@@ -113,4 +129,36 @@
     </section>
 
   </div>
+
+  @if (modal(); as m) {
+    <app-subject-editor-modal
+      [mode]="m.mode"
+      [initial]="m.initial"
+      (saved)="onSaved($event)"
+      (closed)="closeModal()" />
+  }
+
+  @if (confirmDelete(); as cd) {
+    <div class="modal-backdrop" (click)="cancelDelete()">
+      <div class="modal-card seg-confirm" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <header class="modal-head">
+          <h3>Eliminar sujeto</h3>
+        </header>
+        <div class="modal-body">
+          <p>
+            Vas a eliminar <strong>{{ cd.label }}</strong>. Las menciones históricas se conservan,
+            pero SETIQ deja de rastrear este sujeto a partir de ahora.
+          </p>
+        </div>
+        <footer class="modal-foot">
+          <button type="button" class="s-btn ghost" (click)="cancelDelete()"
+                  [disabled]="pendingId() === cd.id">Cancelar</button>
+          <button type="button" class="s-btn danger" (click)="confirmDeleteNow()"
+                  [disabled]="pendingId() === cd.id">
+            {{ pendingId() === cd.id ? 'Eliminando…' : 'Eliminar' }}
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
 </main>

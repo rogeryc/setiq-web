@@ -1,0 +1,167 @@
+// Modal primitives (kept generic so they can be reused for future modals).
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(2px);
+}
+
+.modal-card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 48px);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 12px;
+  border-bottom: 1px solid var(--rule);
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+
+  &:hover { background: var(--card-2); color: var(--ink); }
+}
+
+.modal-body {
+  padding: 18px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px 18px;
+  border-top: 1px solid var(--rule);
+}
+
+.modal-error {
+  background: rgba(229, 69, 69, 0.1);
+  border: 1px solid rgba(229, 69, 69, 0.35);
+  color: var(--neg);
+  padding: 8px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+// Subject-editor specific
+.subj-modal .s-input {
+  width: 100%;
+  background: var(--card-2);
+  font-size: 13px;
+  padding: 9px 12px;
+}
+
+.subj-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.subj-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-2);
+
+  .muted { color: var(--muted); font-weight: 400; margin-left: 4px; }
+}
+
+.subj-kind-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.subj-kind {
+  background: var(--card-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font: inherit;
+  color: var(--ink);
+  transition: all .12s;
+
+  strong { font-size: 13px; font-weight: 600; }
+  span { font-size: 11.5px; color: var(--muted); line-height: 1.35; }
+
+  &:hover { background: var(--card); border-color: var(--rule-strong); }
+  &.active { border-color: var(--acc); background: var(--acc-soft); box-shadow: 0 0 0 2px var(--acc-soft); }
+}
+
+.subj-kind-fixed {
+  background: var(--card-2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: capitalize;
+  color: var(--ink-2);
+  width: fit-content;
+}
+
+.subj-handles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.subj-handle {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.subj-enabled {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+  user-select: none;
+  margin-top: 4px;
+
+  input { width: 14px; height: 14px; accent-color: var(--acc); cursor: pointer; }
+}

@@ -3,6 +3,72 @@
 
 :host { display: contents; }
 
+// --- Mutations: kebab menu, delete-confirm ---
+.seg-card-head { position: relative; }
+
+.seg-menu-wrap { margin-left: auto; position: relative; }
+
+.seg-menu-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0 6px;
+  border-radius: 6px;
+
+  &:hover { background: var(--card-2); color: var(--ink); }
+  &[disabled] { opacity: 0.5; cursor: progress; }
+}
+
+.seg-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 140px;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.22);
+  padding: 4px;
+  z-index: 50;
+
+  button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 7px 10px;
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--ink);
+    cursor: pointer;
+    border-radius: 6px;
+
+    &:hover { background: var(--card-2); }
+    &.danger { color: var(--neg); }
+  }
+}
+
+.s-btn.danger {
+  background: var(--neg);
+  border-color: var(--neg);
+  color: #fff;
+
+  &:hover { opacity: 0.9; }
+}
+
+.seg-confirm p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+
+  strong { color: var(--ink); font-weight: 600; }
+}
+
 .seg-hero {
   .seg-stats {
     display: grid;

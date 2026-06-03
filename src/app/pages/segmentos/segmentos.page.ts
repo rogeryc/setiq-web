@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 
+import { SubjectEditorModalComponent } from '../../shared/subject-editor-modal/subject-editor-modal';
 import { TrackedSubjectsService } from '../../core/api/tracked-subjects.service';
 import { ApiTrackedSubject, SubjectKind } from '../../core/api/types';
 
@@ -40,7 +41,7 @@ type Filter = SubjectKind | 'all';
 
 @Component({
   selector: 'app-segmentos-page',
-  imports: [],
+  imports: [SubjectEditorModalComponent],
   templateUrl: './segmentos.page.html',
   styleUrl: './segmentos.page.scss',
 })
@@ -52,7 +53,12 @@ export class SegmentosPage implements OnInit {
   protected readonly error = signal<string | null>(null);
   protected readonly filter = signal<Filter>('all');
 
-  /** Counts per kind for the filter pills. */
+  /** Modal + per-card menu state. */
+  protected readonly modal = signal<{ mode: 'create' | 'edit'; initial: ApiTrackedSubject | null } | null>(null);
+  protected readonly openMenuId = signal<string | null>(null);
+  protected readonly pendingId = signal<string | null>(null);
+  protected readonly confirmDelete = signal<ApiTrackedSubject | null>(null);
+
   protected readonly counts = computed(() => {
     const subjects = this.data() ?? [];
     const counts: Record<SubjectKind, number> = {
@@ -62,7 +68,6 @@ export class SegmentosPage implements OnInit {
     return counts;
   });
 
-  /** Filter chip definitions in display order. */
   protected readonly filterOptions = computed<{ key: Filter; label: string; count: number }[]>(() => {
     const data = this.data() ?? [];
     const c = this.counts();
@@ -129,5 +134,74 @@ export class SegmentosPage implements OnInit {
 
   handleEntries(handles: Record<string, string>): Array<[string, string]> {
     return Object.entries(handles);
+  }
+
+  // ------------------------------------------------------------------
+  // Mutations
+  // ------------------------------------------------------------------
+
+  openCreate(): void {
+    this.modal.set({ mode: 'create', initial: null });
+  }
+
+  openEdit(s: ApiTrackedSubject): void {
+    this.openMenuId.set(null);
+    this.modal.set({ mode: 'edit', initial: s });
+  }
+
+  closeModal(): void {
+    this.modal.set(null);
+  }
+
+  onSaved(s: ApiTrackedSubject): void {
+    const mode = this.modal()?.mode;
+    this.closeModal();
+    this.data.update((curr) => {
+      if (!curr) return [s];
+      if (mode === 'create') return [s, ...curr];
+      return curr.map((x) => (x.id === s.id ? s : x));
+    });
+  }
+
+  toggleMenu(id: string): void {
+    this.openMenuId.update((curr) => (curr === id ? null : id));
+  }
+
+  async togglePause(s: ApiTrackedSubject): Promise<void> {
+    if (this.pendingId() === s.id) return;
+    this.openMenuId.set(null);
+    this.pendingId.set(s.id);
+    try {
+      const updated = await this.service.update(s.id, { enabled: !s.enabled });
+      this.data.update((curr) => curr?.map((x) => (x.id === s.id ? updated : x)) ?? null);
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.pendingId.set(null);
+    }
+  }
+
+  askDelete(s: ApiTrackedSubject): void {
+    this.openMenuId.set(null);
+    this.confirmDelete.set(s);
+  }
+
+  cancelDelete(): void {
+    this.confirmDelete.set(null);
+  }
+
+  async confirmDeleteNow(): Promise<void> {
+    const s = this.confirmDelete();
+    if (!s || this.pendingId() === s.id) return;
+    this.pendingId.set(s.id);
+    try {
+      await this.service.remove(s.id);
+      this.data.update((curr) => curr?.filter((x) => x.id !== s.id) ?? null);
+      this.confirmDelete.set(null);
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.pendingId.set(null);
+    }
   }
 }
