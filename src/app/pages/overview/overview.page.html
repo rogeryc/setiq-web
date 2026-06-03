@@ -147,8 +147,24 @@
         @if (comps.length > 0) {
           <div class="comp-grid">
             @for (c of comps; track c.id) {
-              <article class="comp-card">
-                <span class="comp-name">{{ c.label }}</span>
+              <a class="comp-card"
+                 routerLink="/segmentos"
+                 [queryParams]="{ subject: c.id }">
+                <div class="comp-head">
+                  <span class="comp-name">{{ c.label }}</span>
+                  @if (c.sentiment_score !== undefined && c.sentiment_score !== null) {
+                    <span class="comp-sent"
+                          [class.pos]="c.sentiment_score >= 0.66"
+                          [class.neu]="c.sentiment_score < 0.66 && c.sentiment_score >= 0.33"
+                          [class.neg]="c.sentiment_score < 0.33"
+                          [title]="'Sentimiento promedio: ' + (c.sentiment_score * 100 | number: '1.0-0') + '%'">
+                      <span class="d"></span>
+                      @if (c.sentiment_score >= 0.66) { positivo }
+                      @else if (c.sentiment_score >= 0.33) { neutral }
+                      @else { negativo }
+                    </span>
+                  }
+                </div>
                 <div class="comp-foot">
                   <span class="comp-mentions"><b>{{ c.mentions }}</b> menciones</span>
                   <span class="comp-delta"
@@ -159,7 +175,7 @@
                     @else { = 0 }
                   </span>
                 </div>
-              </article>
+              </a>
             }
           </div>
         } @else {

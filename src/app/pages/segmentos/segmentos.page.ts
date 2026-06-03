@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import { TrackedSubjectsService } from '../../core/api/tracked-subjects.service';
 import { ApiTrackedSubject, ApiTrackedSubjectDetail, SubjectKind } from '../../core/api/types';
@@ -47,6 +48,7 @@ type Filter = SubjectKind | 'all';
 })
 export class SegmentosPage implements OnInit {
   private readonly service = inject(TrackedSubjectsService);
+  private readonly route = inject(ActivatedRoute);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   protected readonly data = signal<ApiTrackedSubject[] | null>(null);
@@ -112,7 +114,15 @@ export class SegmentosPage implements OnInit {
   async ngOnInit(): Promise<void> {
     if (!this.isBrowser) return;
     try {
-      this.data.set(await this.service.list());
+      const list = await this.service.list();
+      this.data.set(list);
+      // Honor ?subject=<id> — opens the drill-down drawer for that subject
+      // when the page loads (e.g. coming from the competitor panel on /overview).
+      const subjectId = this.route.snapshot.queryParamMap.get('subject');
+      if (subjectId) {
+        const match = list.find((s) => s.id === subjectId);
+        if (match) await this.openDetail(match);
+      }
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : String(e));
     }
