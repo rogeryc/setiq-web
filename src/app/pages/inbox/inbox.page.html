@@ -12,7 +12,10 @@
       <header class="s-inbox-listhead">
         <h2>Inbox <span class="badge">Kaizen</span></h2>
         <div class="sub">
-          @if (data(); as d) { {{ d.total }} conversaciones }
+          @if (filteredData(); as d) {
+            {{ d.total }} conversaciones
+            @if (d.total !== data()?.total) { (de {{ data()?.total }}) }
+          }
           @else { Cargando… }
         </div>
 
@@ -26,10 +29,36 @@
             </button>
           }
         </div>
+
+        <div class="inbox-filterbar">
+          <div class="inbox-filterrow">
+            <span class="inbox-filterrow-label">Sentimiento</span>
+            @for (opt of sentimentOptions; track opt.key) {
+              <button type="button"
+                      class="inbox-filterchip"
+                      [class.active]="sentimentFilter() === opt.key"
+                      (click)="setSentimentFilter(opt.key)">{{ opt.label }}</button>
+            }
+          </div>
+          <div class="inbox-filterrow">
+            <span class="inbox-filterrow-label">Canal</span>
+            @for (opt of channelOptions; track opt.key) {
+              <button type="button"
+                      class="inbox-filterchip"
+                      [class.active]="channelFilter() === opt.key"
+                      (click)="setChannelFilter(opt.key)">{{ opt.label }}</button>
+            }
+          </div>
+        </div>
       </header>
 
       <div class="s-conv-list">
-        @if (data(); as d) {
+        @if (filteredData(); as d) {
+          @if (d.groups.length === 0) {
+            <div class="conv-empty" style="padding: 24px; text-align: center; color: var(--muted)">
+              Sin conversaciones con esos filtros.
+            </div>
+          }
           @for (group of d.groups; track group.key) {
             <div class="conv-group">
               <header class="conv-group-head">

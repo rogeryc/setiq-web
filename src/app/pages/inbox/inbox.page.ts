@@ -56,6 +56,55 @@ export class InboxPage implements OnInit {
   protected readonly actionBusy = signal<boolean>(false);
   protected readonly assignedLabel = signal<string | null>(null);
 
+  // --- Client-side filters (sentiment + channel) ---
+  protected readonly sentimentFilter = signal<'all' | 'positive' | 'neutral' | 'negative'>('all');
+  protected readonly channelFilter = signal<'all' | 'instagram' | 'facebook' | 'tiktok' | 'email'>('all');
+
+  protected readonly sentimentOptions = [
+    { key: 'all',      label: 'Todas' },
+    { key: 'positive', label: 'Positivas' },
+    { key: 'neutral',  label: 'Neutrales' },
+    { key: 'negative', label: 'Negativas' },
+  ] as const;
+
+  protected readonly channelOptions = [
+    { key: 'all',       label: 'Todos' },
+    { key: 'instagram', label: 'Instagram' },
+    { key: 'facebook',  label: 'Facebook' },
+    { key: 'tiktok',    label: 'TikTok' },
+    { key: 'email',     label: 'Email' },
+  ] as const;
+
+  /** Data filtered by the sentiment + channel chips. Groups are
+   *  preserved; empty groups are dropped so the UI doesn't show
+   *  category headers with zero items. */
+  protected readonly filteredData = computed(() => {
+    const list = this.data();
+    if (!list) return null;
+    const sf = this.sentimentFilter();
+    const cf = this.channelFilter();
+    if (sf === 'all' && cf === 'all') return list;
+    const groups = list.groups
+      .map((g) => ({
+        ...g,
+        conversations: g.conversations.filter((c) => {
+          const sentimentOk = sf === 'all' || c.sentiment === sf;
+          const channelOk = cf === 'all' || (c.channel ?? '').startsWith(cf);
+          return sentimentOk && channelOk;
+        }),
+      }))
+      .filter((g) => g.conversations.length > 0);
+    const total = groups.reduce((sum, g) => sum + g.conversations.length, 0);
+    return { ...list, groups, total };
+  });
+
+  setSentimentFilter(s: 'all' | 'positive' | 'neutral' | 'negative'): void {
+    this.sentimentFilter.set(s);
+  }
+  setChannelFilter(c: 'all' | 'instagram' | 'facebook' | 'tiktok' | 'email'): void {
+    this.channelFilter.set(c);
+  }
+
   protected readonly selectedConversation = computed(() => {
     const list = this.data();
     const id = this.selectedId();

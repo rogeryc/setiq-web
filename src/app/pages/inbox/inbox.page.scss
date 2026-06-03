@@ -218,3 +218,50 @@
     font-weight: 600;
   }
 }
+
+// --- Combined filter bar (sentiment + channel) ---
+.inbox-filterbar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.inbox-filterrow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.inbox-filterrow-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 4px;
+  min-width: 76px;
+}
+
+.inbox-filterchip {
+  background: var(--card-2);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font: inherit;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+
+  &:hover { background: var(--card); color: var(--ink); }
+  &.active {
+    background: var(--acc-soft);
+    border-color: var(--acc-bright);
+    color: var(--acc-bright);
+    font-weight: 600;
+  }
+}
