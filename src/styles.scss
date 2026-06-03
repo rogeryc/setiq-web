@@ -328,11 +328,11 @@
 .app.dark .s-status.warn { background: rgba(224,160,69,0.14); color: var(--warn); }
 .app.dark .s-status.ok { background: rgba(84,178,125,0.14); color: var(--pos); }
 .s-toggle { display: inline-flex; gap: 6px; align-items: center; font-size: 11.5px; color: var(--muted); }
-.s-sw { width: 28px; height: 16px; border-radius: 999px; background: var(--rule-strong); position: relative; cursor: pointer; flex-shrink: 0; transition: .15s; }
-.s-sw::after { content: ''; position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: .15s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
-.app.dark .s-sw::after { background: var(--ink-2); }
+.s-sw { appearance: none; -webkit-appearance: none; border: none; padding: 0; margin: 0; font: inherit; display: inline-block; width: 32px; height: 18px; border-radius: 999px; background: var(--rule-strong); position: relative; cursor: pointer; flex-shrink: 0; box-sizing: border-box; transition: background .15s; vertical-align: middle; }
+.s-sw::after { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: left .15s, background .15s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
 .s-sw.on { background: var(--acc); }
-.s-sw.on::after { left: 14px; background: #fff; }
+.s-sw.on::after { left: 16px; background: #fff; }
+.s-sw:focus-visible { outline: 2px solid var(--acc-bright); outline-offset: 2px; }
 
 /* Settings */
 .s-set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
