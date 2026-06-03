@@ -98,6 +98,10 @@ export interface ApiTenantInfo {
   modules: Record<string, unknown>;
 }
 
+export interface ApiTenantDetail extends ApiTenantInfo {
+  settings: Record<string, unknown>;
+}
+
 export interface ApiUserMe {
   id: string;
   email: string;

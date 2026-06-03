@@ -98,3 +98,43 @@ app-ajustes-page { display: contents; }
     color: var(--ink-2);
   }
 }
+
+// --- Save feedback ---
+.aj-saved {
+  font-size: 11px;
+  color: var(--pos);
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.aj-saving {
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: 6px;
+  font-style: italic;
+}
+
+.aj-toggle-wrap,
+.aj-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.aj-input-wrap .s-input {
+  background: var(--card-2);
+  width: 180px;
+}
+
+.aj-loaderr {
+  background: rgba(229, 69, 69, 0.1);
+  border: 1px solid rgba(229, 69, 69, 0.35);
+  color: var(--neg);
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  margin: 8px 0 16px;
+}
+
+// Make the kaizen/policy toggles actually clickable (they were spans before).
+.s-sw[disabled] { opacity: 0.5; cursor: progress; }

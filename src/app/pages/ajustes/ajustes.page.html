@@ -15,12 +15,123 @@
     <section class="s-admin-main">
       <h1>Inquilino y módulos</h1>
       <p class="lede">
-        Plan, identidad, política de IA y configuración interna del inquilino.
-        Hoy esta pantalla es <em>mayormente visual</em> — los cambios todavía
-        no se persisten. Es el mapa de lo que vamos a hacer editable.
+        Plan, módulos activos y política de IA del inquilino. Lo que toques acá
+        se persiste; las secciones marcadas como <em>Próximamente</em> son sólo
+        visuales mientras los endpoints no existan.
       </p>
 
+      @if (loadError(); as err) {
+        <div class="aj-loaderr" role="alert">No pudimos cargar el inquilino: {{ err }}</div>
+      }
+
+      @if (saveError(); as err) {
+        <div class="aj-loaderr" role="alert">Error al guardar: {{ err }}</div>
+      }
+
       <div class="s-set-grid aj-grid">
+
+        <!-- Editable: Plan y módulos (Kaizen toggle) -->
+        <article class="s-set-card aj-card">
+          <header class="aj-card-head">
+            <h3>Plan y módulos</h3>
+            @if (isSaved('modules.kaizen')) { <span class="aj-saved">✓ guardado</span> }
+          </header>
+          <p class="s">SETIQ Core + addons activados para este inquilino.</p>
+
+          <div class="s-set-row aj-row">
+            <div class="lab">
+              <span>SETIQ Core</span>
+              <span class="s2">Dashboards, recomendaciones, segmentos.</span>
+            </div>
+            <span class="s-status ok"><span class="d"></span>Activo</span>
+          </div>
+
+          <div class="s-set-row aj-row">
+            <div class="lab">
+              <span>Kaizen Inbox</span>
+              <span class="s2">Inbox unificado de comentarios y DMs.</span>
+            </div>
+            <button type="button"
+                    class="s-sw"
+                    [class.on]="kaizenEnabled()"
+                    [disabled]="isSaving('modules.kaizen')"
+                    role="switch"
+                    [attr.aria-checked]="kaizenEnabled()"
+                    (click)="toggleKaizen()"></button>
+          </div>
+
+          <div class="s-set-row aj-row">
+            <div class="lab">
+              <span>Voice 0800</span>
+              <span class="s2">Transcripción y análisis de llamadas (addon).</span>
+            </div>
+            <button type="button" class="s-btn ghost">Solicitar</button>
+          </div>
+
+          <div class="s-set-row aj-row">
+            <div class="lab">
+              <span>Off-property monitoring (Apify)</span>
+              <span class="s2">Menciones públicas + posts de competidores.</span>
+            </div>
+            <span class="s-status warn"><span class="d"></span>Sin saldo</span>
+          </div>
+          <p class="aj-footnote">Los precios definitivos se setean cuando se incorpore la empresa.</p>
+        </article>
+
+        <!-- Editable: Política de IA -->
+        <article class="s-set-card aj-card">
+          <header class="aj-card-head">
+            <h3>Política de IA</h3>
+          </header>
+          <p class="s">Qué puede sugerir SETIQ y con qué tono.</p>
+
+          @for (row of aiPolicyRows; track row.key) {
+            <div class="s-set-row aj-row">
+              <div class="lab">
+                <span>{{ row.label }}</span>
+                <span class="s2">{{ row.sub }}</span>
+              </div>
+              <span class="aj-toggle-wrap">
+                @if (isSaved('ai_policy.' + row.key)) { <span class="aj-saved">✓</span> }
+                <button type="button"
+                        class="s-sw"
+                        [class.on]="aiPolicy()[row.key]"
+                        [disabled]="isSaving('ai_policy.' + row.key)"
+                        role="switch"
+                        [attr.aria-checked]="aiPolicy()[row.key]"
+                        (click)="toggleAiPolicy(row.key)"></button>
+              </span>
+            </div>
+          }
+        </article>
+
+        <!-- Editable: Etiquetas de canales -->
+        <article class="s-set-card aj-card">
+          <header class="aj-card-head">
+            <h3>Etiquetas de canales</h3>
+          </header>
+          <p class="s">Cómo se muestran tus cuentas conectadas en el inbox y los dashboards.</p>
+
+          @for (row of channelRows; track row.key) {
+            <div class="s-set-row aj-row">
+              <div class="lab">
+                <span>{{ row.label }}</span>
+              </div>
+              <span class="aj-input-wrap">
+                <input class="s-input"
+                       type="text"
+                       [placeholder]="row.placeholder"
+                       [ngModel]="channelLabels()[row.key]"
+                       (ngModelChange)="onChannelLabelChange(row.key, $event)" />
+                @if (isSaving('channel_labels.' + row.key)) { <span class="aj-saving">guardando…</span> }
+                @else if (isSaved('channel_labels.' + row.key)) { <span class="aj-saved">✓ guardado</span> }
+              </span>
+            </div>
+          }
+          <p class="aj-footnote">Para editar la cuenta conectada, ir a Canales.</p>
+        </article>
+
+        <!-- Read-only / future cards (data-driven) -->
         @for (card of cards; track card.title) {
           <article class="s-set-card aj-card" [class.future]="card.future">
             <header class="aj-card-head">
@@ -38,7 +149,6 @@
                   <span>{{ row.label }}</span>
                   @if (row.sub) { <span class="s2">{{ row.sub }}</span> }
                 </div>
-
                 @switch (row.control) {
                   @case ('status') {
                     <span class="s-status"
@@ -49,20 +159,15 @@
                     </span>
                   }
                   @case ('button') {
-                    <button type="button" class="s-btn ghost" (click)="noop()">
-                      {{ row.buttonLabel }}
-                    </button>
+                    <button type="button" class="s-btn ghost">{{ row.buttonLabel }}</button>
                   }
                   @case ('toggle') {
-                    <span class="s-sw" [class.on]="row.toggleOn" role="switch"
-                          [attr.aria-checked]="row.toggleOn"></span>
+                    <span class="s-sw" [class.on]="row.toggleOn"></span>
                   }
                   @case ('input') {
                     <input class="s-input" type="text" [value]="row.value || ''" readonly />
                   }
-                  @default {
-                    <span class="aj-row-value">{{ row.value }}</span>
-                  }
+                  @default { <span class="aj-row-value">{{ row.value }}</span> }
                 }
               </div>
             }
@@ -71,13 +176,8 @@
             }
           </article>
         }
-      </div>
 
-      <p class="aj-bottom-note">
-        <b>Notas:</b> los toggles e inputs son visuales por ahora. Los
-        endpoints PATCH (<code>/tenants/me/settings</code>, <code>/tenants/me/modules</code>)
-        están en la TODO list y se conectan acá cuando se construyan.
-      </p>
+      </div>
     </section>
 
   </div>
