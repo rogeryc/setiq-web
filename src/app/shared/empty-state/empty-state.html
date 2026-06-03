@@ -1,0 +1,12 @@
+<div class="es" [attr.data-state]="state" role="status" [attr.aria-live]="state === 'loading' ? 'polite' : 'off'">
+  <p class="es-msg">{{ message ?? defaultMessage() }}</p>
+  @if (state === 'error' && errorText) {
+    <p class="es-detail">{{ errorText }}</p>
+  }
+  @if (hint) {
+    <p class="es-hint">{{ hint }}</p>
+  }
+  @if (actionLabel) {
+    <button type="button" class="s-btn" (click)="action.emit()">{{ actionLabel }}</button>
+  }
+</div>

@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, inject, signal } from '@angular/core';
 
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state';
 import { IconComponent } from '../../core/icons/icon';
 import { IconName } from '../../core/icons/icon-set';
 import { ChannelsService } from '../../core/api/channels.service';
@@ -23,7 +24,7 @@ const CHANNEL_ICONS: Record<ChannelKey, IconName> = {
 
 @Component({
   selector: 'app-channels-page',
-  imports: [IconComponent],
+  imports: [IconComponent, EmptyStateComponent],
   templateUrl: './channels.page.html',
   styleUrl: './channels.page.scss',
 })
@@ -37,6 +38,11 @@ export class ChannelsPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     if (!this.isBrowser) return;
+    await this.reload();
+  }
+
+  async reload(): Promise<void> {
+    this.error.set(null);
     try {
       this.data.set(await this.service.list());
     } catch (e) {

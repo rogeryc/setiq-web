@@ -36,6 +36,12 @@
         <button type="button" class="s-btn ghost">Ver tracked subjects</button>
       </div>
 
+      @if (error(); as err) {
+        <app-empty-state state="error" [errorText]="err"
+          message="No pudimos cargar los canales."
+          actionLabel="Reintentar" (action)="reload()" />
+      }
+
       <div class="s-table s-channels-table">
         <div class="row head">
           <span></span>

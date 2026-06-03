@@ -1,4 +1,10 @@
 <main class="s-main">
+  @if (error(); as err) {
+    <div style="padding: 16px 24px 0">
+      <app-empty-state state="error" [errorText]="err"
+        message="Hubo un problema con el inbox." />
+    </div>
+  }
   <div class="s-inbox s-inbox-2col">
 
     <!-- Left rail: grouping toggle + grouped conversation list -->

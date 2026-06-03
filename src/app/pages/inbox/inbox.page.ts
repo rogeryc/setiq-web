@@ -3,6 +3,7 @@ import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angul
 
 import { FormsModule } from '@angular/forms';
 
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state';
 import { IconComponent } from '../../core/icons/icon';
 import { IconName } from '../../core/icons/icon-set';
 import { ConversationsService } from '../../core/api/conversations.service';
@@ -34,7 +35,7 @@ const RELATIVE_FORMAT = new Intl.RelativeTimeFormat('es-BO', { numeric: 'auto' }
 
 @Component({
   selector: 'app-inbox-page',
-  imports: [IconComponent, FormsModule],
+  imports: [IconComponent, FormsModule, EmptyStateComponent],
   templateUrl: './inbox.page.html',
   styleUrl: './inbox.page.scss',
 })
