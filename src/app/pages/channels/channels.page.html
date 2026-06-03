@@ -31,10 +31,33 @@
         en Segmentos.
       </p>
       <div class="toolbar">
-        <button type="button" class="s-btn acc">+ Conectar canal</button>
+        <button type="button" class="s-btn acc" (click)="connectMeta()" [disabled]="metaConnecting()">
+          {{ metaConnecting() ? 'Redirigiendo a Meta…' : '+ Conectar canal' }}
+        </button>
         <button type="button" class="s-btn">Sincronizar todo</button>
         <button type="button" class="s-btn ghost">Ver tracked subjects</button>
       </div>
+
+      @if (metaBanner(); as b) {
+        <div class="ch-meta-banner" [class.success]="b.kind === 'success'" [class.error]="b.kind === 'error'">
+          @if (b.kind === 'success') {
+            <strong>✓ Meta conectado</strong>
+            <p>
+              @if (b.count > 0) {
+                Vinculamos {{ b.count }} {{ b.count === 1 ? 'página' : 'páginas' }} de tu cuenta de Meta.
+                Los webhooks ya están suscritos — los nuevos mensajes y comentarios van a empezar a entrar al inbox.
+              } @else {
+                La conexión funcionó pero no encontramos páginas que administres con esta cuenta de FB.
+                Revisá que la cuenta tenga permisos sobre la página que querías conectar.
+              }
+            </p>
+          } @else {
+            <strong>✗ No pudimos conectar Meta</strong>
+            <p>{{ b.message }}</p>
+          }
+          <button type="button" class="ch-meta-banner-x" (click)="dismissMetaBanner()" aria-label="Cerrar">×</button>
+        </div>
+      }
 
       @if (error(); as err) {
         <app-empty-state state="error" [errorText]="err"

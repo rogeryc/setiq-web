@@ -77,3 +77,36 @@ button.s-toggle {
     opacity: 0.45;
   }
 }
+
+// --- Post-OAuth banner shown after returning from Meta consent flow ---
+.ch-meta-banner {
+  position: relative;
+  margin: 12px 0 18px;
+  padding: 12px 36px 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--rule-strong);
+  background: var(--card);
+  line-height: 1.5;
+
+  &.success { border-color: var(--pos); background: rgba(31,138,91,0.10); }
+  &.error   { border-color: var(--neg); background: rgba(229,69,69,0.10); }
+
+  strong { display: block; font-size: 13px; margin-bottom: 4px; color: var(--ink); }
+  p { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+}
+
+.ch-meta-banner-x {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+
+  &:hover { background: rgba(0,0,0,0.08); color: var(--ink); }
+}
