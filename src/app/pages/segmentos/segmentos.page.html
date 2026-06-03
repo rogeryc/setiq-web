@@ -34,7 +34,7 @@
         <h2>Sujetos rastreados</h2>
         <span class="sub">Editá la lista cuando quieras — los cambios se propagan al próximo ciclo de scraping.</span>
         <span class="right">
-          <button type="button" class="s-btn acc" (click)="openCreate()">+ Agregar sujeto</button>
+          <button type="button" class="s-btn acc" (click)="openModal()">+ Agregar sujeto</button>
         </span>
       </header>
 
@@ -66,24 +66,10 @@
                     <span class="seg-state" [class.on]="s.enabled">
                       {{ s.enabled ? 'Activo' : 'Pausado' }}
                     </span>
-                    <div class="seg-menu-wrap">
-                      <button type="button"
-                              class="seg-menu-btn"
-                              aria-label="Acciones"
-                              [disabled]="pendingId() === s.id"
-                              (click)="toggleMenu(s.id)">⋯</button>
-                      @if (openMenuId() === s.id) {
-                        <div class="seg-menu" role="menu">
-                          <button type="button" (click)="openEdit(s)">Editar</button>
-                          <button type="button" (click)="togglePause(s)">
-                            {{ s.enabled ? 'Pausar' : 'Activar' }}
-                          </button>
-                          <button type="button" class="danger" (click)="askDelete(s)">Eliminar</button>
-                        </div>
-                      }
-                    </div>
                   </header>
-                  <h4 class="seg-card-title">{{ s.label }}</h4>
+                  <h4 class="seg-card-title">
+                    <button type="button" class="seg-title-btn" (click)="openDetail(s)">{{ s.label }}</button>
+                  </h4>
 
                   @if (handleEntries(s.handles).length > 0) {
                     <div class="seg-chips">
@@ -116,6 +102,17 @@
                     <span class="sub">·</span>
                     <span class="sub">{{ formatLastMention(s.last_mention_at) }}</span>
                   </footer>
+
+                  <div class="seg-card-actions">
+                    <button type="button" class="seg-act" (click)="openEdit(s)"
+                            [disabled]="busyId() === s.id">Editar</button>
+                    <button type="button" class="seg-act" (click)="togglePause(s)"
+                            [disabled]="busyId() === s.id">
+                      {{ s.enabled ? 'Pausar' : 'Reactivar' }}
+                    </button>
+                    <button type="button" class="seg-act danger" (click)="deleteSubject(s)"
+                            [disabled]="busyId() === s.id">Eliminar</button>
+                  </div>
                 </article>
               }
             </div>
@@ -130,34 +127,137 @@
 
   </div>
 
-  @if (modal(); as m) {
-    <app-subject-editor-modal
-      [mode]="m.mode"
-      [initial]="m.initial"
-      (saved)="onSaved($event)"
-      (closed)="closeModal()" />
+  @if (showModal()) {
+    <div class="seg-modal-backdrop" (click)="closeModal()">
+      <div class="seg-modal" (click)="$event.stopPropagation()">
+        <header class="seg-modal-head">
+          <h3>{{ editingId() ? 'Editar sujeto' : 'Agregar sujeto' }}</h3>
+          <button type="button" class="seg-modal-x" (click)="closeModal()" aria-label="Cerrar">×</button>
+        </header>
+        <form class="seg-form" (ngSubmit)="submit()">
+          <label class="seg-field">
+            <span>Tipo</span>
+            <select name="kind" [ngModel]="fKind()" (ngModelChange)="fKind.set($event)"
+                    [disabled]="editingId() !== null">
+              <option value="competitor">Competidor</option>
+              <option value="brand">Marca propia</option>
+              <option value="keyword">Tema (keyword)</option>
+              <option value="hashtag">Hashtag</option>
+            </select>
+          </label>
+          <label class="seg-field">
+            <span>Nombre</span>
+            <input type="text" name="label" placeholder="Ej: Diego Penna"
+                   [ngModel]="fLabel()" (ngModelChange)="fLabel.set($event)" />
+          </label>
+          <div class="seg-field-row">
+            <label class="seg-field">
+              <span>Instagram</span>
+              <input type="text" name="ig" placeholder="@handle"
+                     [ngModel]="fInstagram()" (ngModelChange)="fInstagram.set($event)" />
+            </label>
+            <label class="seg-field">
+              <span>TikTok</span>
+              <input type="text" name="tt" placeholder="@handle"
+                     [ngModel]="fTiktok()" (ngModelChange)="fTiktok.set($event)" />
+            </label>
+            <label class="seg-field">
+              <span>Facebook</span>
+              <input type="text" name="fb" placeholder="page"
+                     [ngModel]="fFacebook()" (ngModelChange)="fFacebook.set($event)" />
+            </label>
+          </div>
+          <label class="seg-field">
+            <span>Keywords (separadas por coma)</span>
+            <input type="text" name="kw" placeholder="decreto, economía"
+                   [ngModel]="fKeywords()" (ngModelChange)="fKeywords.set($event)" />
+          </label>
+          <label class="seg-field">
+            <span>Hashtags (separados por coma)</span>
+            <input type="text" name="hash" placeholder="periodismo, bolivia"
+                   [ngModel]="fHashtags()" (ngModelChange)="fHashtags.set($event)" />
+          </label>
+          @if (formError()) {
+            <p class="seg-form-error">{{ formError() }}</p>
+          }
+          <footer class="seg-modal-foot">
+            <button type="button" class="s-btn ghost" (click)="closeModal()" [disabled]="submitting()">Cancelar</button>
+            <button type="submit" class="s-btn acc" [disabled]="submitting()">
+              {{ submitting() ? 'Guardando…' : 'Agregar' }}
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
   }
 
-  @if (confirmDelete(); as cd) {
-    <div class="modal-backdrop" (click)="cancelDelete()">
-      <div class="modal-card seg-confirm" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-        <header class="modal-head">
-          <h3>Eliminar sujeto</h3>
+  @if (showDetail()) {
+    <div class="seg-modal-backdrop" (click)="closeDetail()">
+      <div class="seg-detail" (click)="$event.stopPropagation()">
+        <header class="seg-modal-head">
+          <h3>{{ detail()?.label ?? 'Detalle' }}</h3>
+          <button type="button" class="seg-modal-x" (click)="closeDetail()" aria-label="Cerrar">×</button>
         </header>
-        <div class="modal-body">
-          <p>
-            Vas a eliminar <strong>{{ cd.label }}</strong>. Las menciones históricas se conservan,
-            pero SETIQ deja de rastrear este sujeto a partir de ahora.
-          </p>
+        <div class="seg-detail-body">
+          @if (detailLoading()) {
+            <p class="seg-detail-muted">Cargando detalle…</p>
+          } @else if (detailError()) {
+            <p class="seg-form-error">{{ detailError() }}</p>
+          } @else if (detail(); as d) {
+            <div class="seg-detail-stat">
+              <span class="num">{{ d.mention_count }}</span>
+              <span class="seg-detail-muted">menciones totales</span>
+            </div>
+
+            <section class="seg-detail-sec">
+              <h4>Sentimiento</h4>
+              <div class="seg-sent-bar">
+                <span class="pos" [style.width.%]="sentimentPct(d, 'positive')"></span>
+                <span class="neu" [style.width.%]="sentimentPct(d, 'neutral')"></span>
+                <span class="neg" [style.width.%]="sentimentPct(d, 'negative')"></span>
+              </div>
+              <div class="seg-sent-legend">
+                <span><i class="dot pos"></i> Positivo {{ d.sentiment_breakdown.positive }}</span>
+                <span><i class="dot neu"></i> Neutral {{ d.sentiment_breakdown.neutral }}</span>
+                <span><i class="dot neg"></i> Negativo {{ d.sentiment_breakdown.negative }}</span>
+              </div>
+            </section>
+
+            <section class="seg-detail-sec">
+              <h4>Menciones recientes</h4>
+              @if (d.recent_mentions.length > 0) {
+                <ul class="seg-mentions">
+                  @for (m of d.recent_mentions; track m.id) {
+                    <li class="seg-mention">
+                      <div class="seg-mention-head">
+                        <span class="seg-mention-author">{{ m.author_display_name || m.author_handle || 'Anónimo' }}</span>
+                        <span class="seg-mention-meta">{{ m.platform }}@if (m.sentiment) { · {{ m.sentiment }} }</span>
+                      </div>
+                      @if (m.content_text) {
+                        <p class="seg-mention-text">{{ m.content_text }}</p>
+                      }
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="seg-detail-muted">Sin menciones todavía.</p>
+              }
+            </section>
+
+            <section class="seg-detail-sec">
+              <h4>Solapamiento de audiencia</h4>
+              @if (d.audience_overlap.length > 0) {
+                <div class="seg-chips">
+                  @for (c of d.audience_overlap; track c.id) {
+                    <span class="seg-chip">{{ c.display_name || 'Contacto' }}</span>
+                  }
+                </div>
+              } @else {
+                <p class="seg-detail-muted">Sin contactos en común detectados todavía.</p>
+              }
+            </section>
+          }
         </div>
-        <footer class="modal-foot">
-          <button type="button" class="s-btn ghost" (click)="cancelDelete()"
-                  [disabled]="pendingId() === cd.id">Cancelar</button>
-          <button type="button" class="s-btn danger" (click)="confirmDeleteNow()"
-                  [disabled]="pendingId() === cd.id">
-            {{ pendingId() === cd.id ? 'Eliminando…' : 'Eliminar' }}
-          </button>
-        </footer>
       </div>
     </div>
   }

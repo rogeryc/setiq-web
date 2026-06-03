@@ -4,6 +4,19 @@
 
 :host { display: contents; }
 
+@media (max-width: 860px) {
+  .s-inbox-2col {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .s-inbox-list {
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
+    max-height: 50vh;
+  }
+}
+
 .s-inbox-2col {
   display: grid;
   grid-template-columns: 360px 1fr;
@@ -140,13 +153,52 @@
   border-top: 1px solid var(--rule);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
   background: var(--card);
 
   .sub {
     font-size: 11.5px;
     color: var(--muted);
   }
+}
+
+.s-detail-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.s-conv-status {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 3px 8px;
+
+  &.resolved {
+    color: var(--pos);
+    border-color: var(--pos);
+  }
+}
+
+.s-reassign {
+  background: var(--card-2);
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  padding: 6px 9px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--ink);
+
+  &:focus { outline: none; border-color: var(--acc-bright); }
+}
+
+.s-assigned {
+  font-size: 12px;
+  color: var(--pos);
 }
 
 // Make message thread scroll cleanly within the available height

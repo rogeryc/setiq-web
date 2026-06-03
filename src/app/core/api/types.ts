@@ -70,6 +70,21 @@ export interface ApiOverviewResponse {
   generated_at: string;  // ISO 8601
 }
 
+export interface ApiCompetitorActivity {
+  id: string;
+  label: string;
+  mentions: number;
+  previous: number;
+  delta: number;
+  sentiment_score?: number;
+}
+
+export interface ApiCompetitorActivityResponse {
+  period_days: number;
+  competitors: ApiCompetitorActivity[];
+  generated_at: string;
+}
+
 export interface ApiTokenResponse {
   access_token: string;
   token_type: string;
@@ -138,6 +153,12 @@ export interface ApiMessageDetail {
   sender_handle?: string;
 }
 
+export interface ApiConversationMutation {
+  id: string;
+  status: string;
+  assigned_user_id?: string;
+}
+
 export interface ApiConversationDetail {
   id: string;
   contact_name?: string;
@@ -177,6 +198,18 @@ export interface ApiChannelsResponse {
   channels: ApiChannelStatus[];
   connected_count: number;
   warning_count: number;
+}
+
+export interface ApiSearchHit {
+  type: 'contact' | 'tracked_subject' | 'conversation';
+  id: string;
+  title: string;
+  subtitle?: string;
+}
+
+export interface ApiSearchResponse {
+  query: string;
+  hits: ApiSearchHit[];
 }
 
 export type SubjectKind = 'competitor' | 'brand' | 'keyword' | 'hashtag';
@@ -255,4 +288,36 @@ export interface ApiTrackedSubjectUpdate {
   keywords?: string[];
   hashtags?: string[];
   enabled?: boolean;
+}
+
+export interface ApiMentionPreview {
+  id: string;
+  platform: string;
+  author_display_name?: string;
+  author_handle?: string;
+  content_text?: string;
+  content_url?: string;
+  published_at?: string;
+  sentiment?: string;
+}
+
+export interface ApiSentimentBreakdown {
+  positive: number;
+  neutral: number;
+  negative: number;
+}
+
+export interface ApiOverlapContact {
+  id: string;
+  display_name?: string;
+}
+
+export interface ApiTrackedSubjectDetail {
+  id: string;
+  kind: SubjectKind;
+  label: string;
+  mention_count: number;
+  sentiment_breakdown: ApiSentimentBreakdown;
+  recent_mentions: ApiMentionPreview[];
+  audience_overlap: ApiOverlapContact[];
 }

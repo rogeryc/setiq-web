@@ -1,9 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
-import { SubjectEditorModalComponent } from '../../shared/subject-editor-modal/subject-editor-modal';
 import { TrackedSubjectsService } from '../../core/api/tracked-subjects.service';
-import { ApiTrackedSubject, SubjectKind } from '../../core/api/types';
+import { ApiTrackedSubject, ApiTrackedSubjectDetail, SubjectKind } from '../../core/api/types';
 
 interface KindSection {
   kind: SubjectKind;
@@ -41,7 +41,7 @@ type Filter = SubjectKind | 'all';
 
 @Component({
   selector: 'app-segmentos-page',
-  imports: [SubjectEditorModalComponent],
+  imports: [FormsModule],
   templateUrl: './segmentos.page.html',
   styleUrl: './segmentos.page.scss',
 })
@@ -53,12 +53,7 @@ export class SegmentosPage implements OnInit {
   protected readonly error = signal<string | null>(null);
   protected readonly filter = signal<Filter>('all');
 
-  /** Modal + per-card menu state. */
-  protected readonly modal = signal<{ mode: 'create' | 'edit'; initial: ApiTrackedSubject | null } | null>(null);
-  protected readonly openMenuId = signal<string | null>(null);
-  protected readonly pendingId = signal<string | null>(null);
-  protected readonly confirmDelete = signal<ApiTrackedSubject | null>(null);
-
+  /** Counts per kind for the filter pills. */
   protected readonly counts = computed(() => {
     const subjects = this.data() ?? [];
     const counts: Record<SubjectKind, number> = {
@@ -68,6 +63,7 @@ export class SegmentosPage implements OnInit {
     return counts;
   });
 
+  /** Filter chip definitions in display order. */
   protected readonly filterOptions = computed<{ key: Filter; label: string; count: number }[]>(() => {
     const data = this.data() ?? [];
     const c = this.counts();
@@ -136,72 +132,165 @@ export class SegmentosPage implements OnInit {
     return Object.entries(handles);
   }
 
-  // ------------------------------------------------------------------
-  // Mutations
-  // ------------------------------------------------------------------
+  protected readonly showModal = signal(false);
+  protected readonly submitting = signal(false);
+  protected readonly formError = signal<string | null>(null);
+  protected readonly editingId = signal<string | null>(null);
+  protected readonly busyId = signal<string | null>(null);
 
-  openCreate(): void {
-    this.modal.set({ mode: 'create', initial: null });
+  protected readonly fKind = signal<SubjectKind>('competitor');
+  protected readonly fLabel = signal('');
+  protected readonly fInstagram = signal('');
+  protected readonly fTiktok = signal('');
+  protected readonly fFacebook = signal('');
+  protected readonly fKeywords = signal('');
+  protected readonly fHashtags = signal('');
+
+  private resetForm(): void {
+    this.formError.set(null);
+    this.fKind.set('competitor');
+    this.fLabel.set('');
+    this.fInstagram.set('');
+    this.fTiktok.set('');
+    this.fFacebook.set('');
+    this.fKeywords.set('');
+    this.fHashtags.set('');
+  }
+
+  openModal(): void {
+    this.editingId.set(null);
+    this.resetForm();
+    this.showModal.set(true);
   }
 
   openEdit(s: ApiTrackedSubject): void {
-    this.openMenuId.set(null);
-    this.modal.set({ mode: 'edit', initial: s });
+    this.editingId.set(s.id);
+    this.formError.set(null);
+    this.fKind.set(s.kind);
+    this.fLabel.set(s.label);
+    this.fInstagram.set(s.handles['instagram'] ?? '');
+    this.fTiktok.set(s.handles['tiktok'] ?? '');
+    this.fFacebook.set(s.handles['facebook'] ?? '');
+    this.fKeywords.set(s.keywords.join(', '));
+    this.fHashtags.set(s.hashtags.join(', '));
+    this.showModal.set(true);
   }
 
   closeModal(): void {
-    this.modal.set(null);
+    if (!this.submitting()) this.showModal.set(false);
   }
 
-  onSaved(s: ApiTrackedSubject): void {
-    const mode = this.modal()?.mode;
-    this.closeModal();
-    this.data.update((curr) => {
-      if (!curr) return [s];
-      if (mode === 'create') return [s, ...curr];
-      return curr.map((x) => (x.id === s.id ? s : x));
-    });
+  private splitList(value: string): string[] {
+    return value.split(',').map((s) => s.trim()).filter(Boolean);
   }
 
-  toggleMenu(id: string): void {
-    this.openMenuId.update((curr) => (curr === id ? null : id));
+  async submit(): Promise<void> {
+    if (this.submitting()) return;
+    const label = this.fLabel().trim();
+    if (!label) {
+      this.formError.set('El nombre es obligatorio.');
+      return;
+    }
+    const handles: Record<string, string> = {};
+    if (this.fInstagram().trim()) handles['instagram'] = this.fInstagram().trim();
+    if (this.fTiktok().trim()) handles['tiktok'] = this.fTiktok().trim();
+    if (this.fFacebook().trim()) handles['facebook'] = this.fFacebook().trim();
+    const keywords = this.splitList(this.fKeywords());
+    const hashtags = this.splitList(this.fHashtags());
+
+    this.submitting.set(true);
+    this.formError.set(null);
+    try {
+      const id = this.editingId();
+      if (id) {
+        const updated = await this.service.update(id, { label, handles, keywords, hashtags });
+        this.data.update((list) =>
+          (list ?? []).map((s) =>
+            s.id === id
+              ? { ...updated, mention_count: s.mention_count, last_mention_at: s.last_mention_at }
+              : s,
+          ),
+        );
+      } else {
+        const created = await this.service.create({
+          kind: this.fKind(),
+          label,
+          handles,
+          keywords,
+          hashtags,
+          enabled: true,
+        });
+        this.data.update((list) => [created, ...(list ?? [])]);
+      }
+      this.showModal.set(false);
+    } catch (e) {
+      this.formError.set(e instanceof Error ? e.message : 'No se pudo guardar el sujeto.');
+    } finally {
+      this.submitting.set(false);
+    }
   }
 
   async togglePause(s: ApiTrackedSubject): Promise<void> {
-    if (this.pendingId() === s.id) return;
-    this.openMenuId.set(null);
-    this.pendingId.set(s.id);
+    if (this.busyId()) return;
+    this.busyId.set(s.id);
     try {
       const updated = await this.service.update(s.id, { enabled: !s.enabled });
-      this.data.update((curr) => curr?.map((x) => (x.id === s.id ? updated : x)) ?? null);
+      this.data.update((list) =>
+        (list ?? []).map((x) =>
+          x.id === s.id
+            ? { ...updated, mention_count: x.mention_count, last_mention_at: x.last_mention_at }
+            : x,
+        ),
+      );
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : String(e));
     } finally {
-      this.pendingId.set(null);
+      this.busyId.set(null);
     }
   }
 
-  askDelete(s: ApiTrackedSubject): void {
-    this.openMenuId.set(null);
-    this.confirmDelete.set(s);
-  }
-
-  cancelDelete(): void {
-    this.confirmDelete.set(null);
-  }
-
-  async confirmDeleteNow(): Promise<void> {
-    const s = this.confirmDelete();
-    if (!s || this.pendingId() === s.id) return;
-    this.pendingId.set(s.id);
+  async deleteSubject(s: ApiTrackedSubject): Promise<void> {
+    if (this.busyId()) return;
+    if (this.isBrowser && !confirm(`¿Eliminar "${s.label}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+    this.busyId.set(s.id);
     try {
       await this.service.remove(s.id);
-      this.data.update((curr) => curr?.filter((x) => x.id !== s.id) ?? null);
-      this.confirmDelete.set(null);
+      this.data.update((list) => (list ?? []).filter((x) => x.id !== s.id));
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : String(e));
     } finally {
-      this.pendingId.set(null);
+      this.busyId.set(null);
     }
+  }
+
+  protected readonly showDetail = signal(false);
+  protected readonly detailLoading = signal(false);
+  protected readonly detail = signal<ApiTrackedSubjectDetail | null>(null);
+  protected readonly detailError = signal<string | null>(null);
+
+  async openDetail(s: ApiTrackedSubject): Promise<void> {
+    this.showDetail.set(true);
+    this.detail.set(null);
+    this.detailError.set(null);
+    this.detailLoading.set(true);
+    try {
+      this.detail.set(await this.service.detail(s.id));
+    } catch (e) {
+      this.detailError.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.detailLoading.set(false);
+    }
+  }
+
+  closeDetail(): void {
+    this.showDetail.set(false);
+  }
+
+  sentimentPct(detail: ApiTrackedSubjectDetail, key: 'positive' | 'neutral' | 'negative'): number {
+    const b = detail.sentiment_breakdown;
+    const total = b.positive + b.neutral + b.negative;
+    return total > 0 ? Math.round((b[key] / total) * 100) : 0;
   }
 }

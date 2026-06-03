@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { catchError, throwError } from 'rxjs';
 
 import { AuthService } from './auth.service';
@@ -15,7 +15,7 @@ import { AuthService } from './auth.service';
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
-  const router = inject(Router);
+  const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   const isLogin = req.url.includes('/auth/login');
   const token = auth.token();
 
@@ -25,7 +25,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(outgoing).pipe(
     catchError((err: unknown) => {
-      if (!isLogin && err instanceof HttpErrorResponse && err.status === 401) {
+      if (isBrowser && !isLogin && err instanceof HttpErrorResponse && err.status === 401) {
         auth.logout();
         // logout() already navigates to /login; nothing else to do here.
       }

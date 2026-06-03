@@ -1,10 +1,12 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 import { AuthService } from '../../core/api/auth.service';
 import { IconComponent } from '../../core/icons/icon';
 import { MeService } from '../../core/api/me.service';
 import { OverviewService } from '../../core/api/overview.service';
 import { ThemeService } from '../../core/theme.service';
+import { SearchPaletteComponent } from '../../shared/search-palette/search-palette';
 
 const TIME_FORMAT = new Intl.DateTimeFormat('es-BO', {
   weekday: 'short',
@@ -18,7 +20,7 @@ const TIME_FORMAT = new Intl.DateTimeFormat('es-BO', {
 
 @Component({
   selector: 'app-masthead',
-  imports: [IconComponent],
+  imports: [IconComponent, SearchPaletteComponent],
   templateUrl: './masthead.html',
 })
 export class MastheadComponent implements OnInit {
@@ -26,6 +28,7 @@ export class MastheadComponent implements OnInit {
   private readonly overview = inject(OverviewService);
   private readonly me = inject(MeService);
   private readonly auth = inject(AuthService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   readonly tenantLabel = this.me.tenantLabel;
   readonly userInitials = this.me.initials;
@@ -41,6 +44,7 @@ export class MastheadComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    if (!this.isBrowser) return;
     this.me.ensureLoaded().catch(() => {/* 401 interceptor will redirect */});
   }
 

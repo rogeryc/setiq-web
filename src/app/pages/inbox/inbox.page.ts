@@ -1,12 +1,16 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 
+import { FormsModule } from '@angular/forms';
+
 import { IconComponent } from '../../core/icons/icon';
 import { IconName } from '../../core/icons/icon-set';
 import { ConversationsService } from '../../core/api/conversations.service';
+import { TeamService } from '../../core/api/team.service';
 import {
   ApiConversationDetail,
   ApiConversationsResponse,
+  ApiTeamMember,
   GroupBy,
 } from '../../core/api/types';
 
@@ -30,12 +34,13 @@ const RELATIVE_FORMAT = new Intl.RelativeTimeFormat('es-BO', { numeric: 'auto' }
 
 @Component({
   selector: 'app-inbox-page',
-  imports: [IconComponent],
+  imports: [IconComponent, FormsModule],
   templateUrl: './inbox.page.html',
   styleUrl: './inbox.page.scss',
 })
 export class InboxPage implements OnInit {
   private readonly service = inject(ConversationsService);
+  private readonly team = inject(TeamService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   readonly groupOptions = GROUP_OPTIONS;
@@ -46,6 +51,9 @@ export class InboxPage implements OnInit {
   protected readonly detail = signal<ApiConversationDetail | null>(null);
   protected readonly error = signal<string | null>(null);
   protected readonly loading = signal<boolean>(false);
+  protected readonly members = signal<ApiTeamMember[]>([]);
+  protected readonly actionBusy = signal<boolean>(false);
+  protected readonly assignedLabel = signal<string | null>(null);
 
   protected readonly selectedConversation = computed(() => {
     const list = this.data();
@@ -61,6 +69,11 @@ export class InboxPage implements OnInit {
   async ngOnInit(): Promise<void> {
     if (!this.isBrowser) return;
     await this.loadList(this.groupBy());
+    try {
+      this.members.set((await this.team.list()).members);
+    } catch {
+      this.members.set([]);
+    }
   }
 
   async setGroupBy(g: GroupBy): Promise<void> {
@@ -76,6 +89,7 @@ export class InboxPage implements OnInit {
   async selectConversation(id: string): Promise<void> {
     this.selectedId.set(id);
     this.detail.set(null);
+    this.assignedLabel.set(null);
     try {
       const d = await this.service.detail(id, this.groupBy() === 'thread');
       this.detail.set(d);
@@ -139,6 +153,50 @@ export class InboxPage implements OnInit {
     if (sentiment === 'negative') return 'neg';
     if (sentiment === 'neutral')  return 'neutral';
     return '';
+  }
+
+  private applyStatus(id: string, status: string): void {
+    this.data.update((list) => {
+      if (!list) return list;
+      return {
+        ...list,
+        groups: list.groups.map((g) => ({
+          ...g,
+          conversations: g.conversations.map((c) => (c.id === id ? { ...c, status } : c)),
+        })),
+      };
+    });
+    const d = this.detail();
+    if (d && d.id === id) this.detail.set({ ...d, status });
+  }
+
+  async markResolved(): Promise<void> {
+    const id = this.selectedId();
+    if (!id || this.actionBusy()) return;
+    this.actionBusy.set(true);
+    try {
+      const res = await this.service.update(id, { status: 'resolved' });
+      this.applyStatus(id, res.status);
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.actionBusy.set(false);
+    }
+  }
+
+  async reassign(userId: string): Promise<void> {
+    const id = this.selectedId();
+    if (!id || !userId || this.actionBusy()) return;
+    this.actionBusy.set(true);
+    try {
+      await this.service.update(id, { assigned_user_id: userId });
+      const m = this.members().find((x) => x.id === userId);
+      this.assignedLabel.set(m ? m.name : 'asignado');
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.actionBusy.set(false);
+    }
   }
 
   private async loadList(g: GroupBy): Promise<void> {

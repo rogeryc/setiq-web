@@ -61,7 +61,7 @@
         </span>
       </header>
 
-      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-top:20px">
+      <div class="ov-decisions">
         @if (data()?.featured_recommendation; as rec) {
           <app-featured-rec-card
             [title]="rec.title"
@@ -107,7 +107,7 @@
         </app-chart-card>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px">
+      <div class="ov-memos">
         @if (data()?.memos; as memos) {
           @for (m of memos; track m.tag) {
             <app-memo-card
@@ -128,6 +128,46 @@
           }
         }
       </div>
+    </section>
+
+    <!-- Competitor activity -->
+    <section class="s-section">
+      <header class="s-secthead">
+        <h2>Actividad de competidores</h2>
+        <span class="sub">Últimos 7 días · menciones y variación vs. semana previa</span>
+        <span class="right">
+          <a routerLink="/segmentos"
+             style="color:var(--acc-bright);text-decoration:none;font-weight:600">
+            Ver segmentos →
+          </a>
+        </span>
+      </header>
+
+      @if (competitors(); as comps) {
+        @if (comps.length > 0) {
+          <div class="comp-grid">
+            @for (c of comps; track c.id) {
+              <article class="comp-card">
+                <span class="comp-name">{{ c.label }}</span>
+                <div class="comp-foot">
+                  <span class="comp-mentions"><b>{{ c.mentions }}</b> menciones</span>
+                  <span class="comp-delta"
+                        [class.up]="c.delta > 0"
+                        [class.down]="c.delta < 0">
+                    @if (c.delta > 0) { ↑ +{{ c.delta }} }
+                    @else if (c.delta < 0) { ↓ {{ c.delta }} }
+                    @else { = 0 }
+                  </span>
+                </div>
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="comp-empty">Sin actividad de competidores en el período.</div>
+        }
+      } @else {
+        <div class="comp-empty">Cargando actividad de competidores…</div>
+      }
     </section>
 
   </div>
