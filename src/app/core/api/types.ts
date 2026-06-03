@@ -263,6 +263,18 @@ export interface ApiTeamResponse {
   total: number;
 }
 
+export interface ApiInviteRequest {
+  email: string;
+  name?: string;
+  role: TeamRole;
+}
+
+export interface ApiInviteResponse {
+  member: ApiTeamMember;
+  temp_password: string | null;  // non-null only on user creation
+  created_user: boolean;
+}
+
 export interface ApiTrackedSubject {
   id: string;
   kind: SubjectKind;

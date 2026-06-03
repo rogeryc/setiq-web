@@ -39,9 +39,35 @@
         <h2>Miembros</h2>
         <span class="sub">El nivel de acceso se puede cambiar en cualquier momento.</span>
         <span class="right">
-          <button type="button" class="s-btn acc">+ Invitar persona</button>
+          <button type="button" class="s-btn acc" (click)="openInvite()">+ Invitar persona</button>
         </span>
       </header>
+
+      @if (lastInvite(); as inv) {
+        <div class="eq-invite-result"
+             [class.created]="inv.created_user"
+             [class.existing]="!inv.created_user">
+          <div class="eq-invite-result-body">
+            @if (inv.created_user && inv.temp_password) {
+              <strong>✓ Invitamos a {{ inv.member.email }}</strong>
+              <p>
+                Como Postmark todavía no está conectado, compartile esta contraseña
+                temporal por un canal seguro. <b>No va a aparecer de nuevo.</b>
+              </p>
+              <div class="eq-invite-cred">
+                <input class="s-input" type="text" readonly [value]="inv.temp_password" />
+                <button type="button" class="s-btn" (click)="copyPassword()">
+                  {{ passwordCopied() ? '✓ Copiada' : 'Copiar' }}
+                </button>
+              </div>
+            } @else {
+              <strong>✓ {{ inv.member.email }} ya tenía cuenta</strong>
+              <p>La agregamos al equipo como <b>{{ roleLabel(inv.member.role) }}</b>. Usa su contraseña existente para entrar.</p>
+            }
+          </div>
+          <button type="button" class="eq-invite-dismiss" (click)="dismissLastInvite()" aria-label="Cerrar">×</button>
+        </div>
+      }
 
       @if (data()) {
         <div class="eq-filterbar">
@@ -90,4 +116,70 @@
     </section>
 
   </div>
+
+  @if (inviteOpen()) {
+    <div class="modal-backdrop" (click)="closeInvite()">
+      <div class="modal-card eq-invite-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <header class="modal-head">
+          <h3>Invitar persona</h3>
+          <button type="button" class="modal-close" (click)="closeInvite()" aria-label="Cerrar">×</button>
+        </header>
+
+        <div class="modal-body">
+          <label class="eq-form-field">
+            <span>Email</span>
+            <input class="s-input"
+                   type="email"
+                   autocomplete="off"
+                   placeholder="persona@thalma.bo"
+                   [ngModel]="inviteEmail()"
+                   (ngModelChange)="inviteEmail.set($event)"
+                   [disabled]="inviteSubmitting()" />
+          </label>
+
+          <label class="eq-form-field">
+            <span>Nombre <span class="muted">(opcional)</span></span>
+            <input class="s-input"
+                   type="text"
+                   placeholder="Cómo aparece en la lista"
+                   [ngModel]="inviteName()"
+                   (ngModelChange)="inviteName.set($event)"
+                   [disabled]="inviteSubmitting()" />
+          </label>
+
+          <div class="eq-form-field">
+            <span>Rol</span>
+            <div class="eq-role-grid">
+              @for (opt of roleOptions; track opt.key) {
+                <button type="button"
+                        class="eq-role-pick"
+                        [class.active]="inviteRole() === opt.key"
+                        [disabled]="inviteSubmitting()"
+                        (click)="inviteRole.set(opt.key)">
+                  <strong>{{ opt.label }}</strong>
+                  <span>{{ roleDescription(opt.key) }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (inviteError(); as err) {
+            <div class="modal-error">{{ err }}</div>
+          }
+
+          <p class="eq-form-hint">
+            Hasta que tengamos email automatizado, vamos a mostrarte una contraseña
+            temporal cuando se cree la cuenta — compartila vos por canal seguro.
+          </p>
+        </div>
+
+        <footer class="modal-foot">
+          <button type="button" class="s-btn ghost" (click)="closeInvite()" [disabled]="inviteSubmitting()">Cancelar</button>
+          <button type="button" class="s-btn acc" (click)="submitInvite()" [disabled]="inviteSubmitting() || !inviteEmail().trim()">
+            {{ inviteSubmitting() ? 'Invitando…' : 'Invitar' }}
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
 </main>

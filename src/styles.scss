@@ -375,3 +375,14 @@ body { min-height: 100vh; }
   .s-hero-kpis { grid-template-columns: 1fr; }
   .s-admin-main { padding: 20px 16px; }
 }
+
+/* Generic modal primitives — used by any page-level modal. */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(2px); }
+.modal-card { background: var(--card); border: 1px solid var(--rule); border-radius: 14px; box-shadow: 0 16px 40px rgba(0,0,0,0.32); width: 100%; max-width: 520px; display: flex; flex-direction: column; max-height: calc(100vh - 48px); }
+.modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px 12px; border-bottom: 1px solid var(--rule); }
+.modal-head h3 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+.modal-close { background: none; border: none; font-size: 22px; line-height: 1; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+.modal-close:hover { background: var(--card-2); color: var(--ink); }
+.modal-body { padding: 18px 22px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 22px 18px; border-top: 1px solid var(--rule); }
+.modal-error { background: rgba(229, 69, 69, 0.1); border: 1px solid rgba(229, 69, 69, 0.35); color: var(--neg); padding: 8px 11px; border-radius: 8px; font-size: 12px; line-height: 1.45; }

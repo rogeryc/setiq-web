@@ -1,8 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { TeamService } from '../../core/api/team.service';
-import { ApiTeamMember, ApiTeamResponse, TeamRole } from '../../core/api/types';
+import { ApiInviteResponse, ApiTeamMember, ApiTeamResponse, TeamRole } from '../../core/api/types';
 
 type Filter = TeamRole | 'all';
 
@@ -26,7 +27,7 @@ const DATE_FORMAT = new Intl.DateTimeFormat('es-BO', {
 
 @Component({
   selector: 'app-equipo-page',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './equipo.page.html',
   styleUrl: './equipo.page.scss',
 })
@@ -37,6 +38,24 @@ export class EquipoPage implements OnInit {
   protected readonly data = signal<ApiTeamResponse | null>(null);
   protected readonly error = signal<string | null>(null);
   protected readonly filter = signal<Filter>('all');
+
+  // --- Invite modal state ---
+  protected readonly inviteOpen = signal(false);
+  protected readonly inviteSubmitting = signal(false);
+  protected readonly inviteError = signal<string | null>(null);
+  protected readonly inviteEmail = signal('');
+  protected readonly inviteName = signal('');
+  protected readonly inviteRole = signal<TeamRole>('agent');
+
+  /** Last invite result — drives the credentials banner. Cleared by dismiss. */
+  protected readonly lastInvite = signal<ApiInviteResponse | null>(null);
+  protected readonly passwordCopied = signal(false);
+
+  protected readonly roleOptions: { key: TeamRole; label: string }[] = [
+    { key: 'admin',  label: 'Admin' },
+    { key: 'agent',  label: 'Agente' },
+    { key: 'viewer', label: 'Lector' },
+  ];
 
   protected readonly filterOptions = computed<{ key: Filter; label: string; count: number }[]>(() => {
     const d = this.data();
@@ -84,5 +103,78 @@ export class EquipoPage implements OnInit {
     const diffHr = Math.round(diffMin / 60);
     if (Math.abs(diffHr) < 48) return TIME_FORMAT.format(diffHr, 'hour');
     return TIME_FORMAT.format(Math.round(diffHr / 24), 'day');
+  }
+
+  // --- Invite flow -----------------------------------------------------
+
+  openInvite(): void {
+    this.inviteError.set(null);
+    this.inviteEmail.set('');
+    this.inviteName.set('');
+    this.inviteRole.set('agent');
+    this.inviteOpen.set(true);
+  }
+
+  closeInvite(): void {
+    if (!this.inviteSubmitting()) this.inviteOpen.set(false);
+  }
+
+  async submitInvite(): Promise<void> {
+    if (this.inviteSubmitting()) return;
+    const email = this.inviteEmail().trim();
+    if (!email || !email.includes('@')) {
+      this.inviteError.set('Ingresá un email válido.');
+      return;
+    }
+    this.inviteSubmitting.set(true);
+    this.inviteError.set(null);
+    try {
+      const result = await this.service.invite({
+        email,
+        name: this.inviteName().trim() || undefined,
+        role: this.inviteRole(),
+      });
+      this.lastInvite.set(result);
+      this.passwordCopied.set(false);
+
+      // Refresh the list — handles both create-new and role-flip cases.
+      this.data.update((curr) => {
+        if (!curr) return curr;
+        const exists = curr.members.some((m) => m.id === result.member.id);
+        const members = exists
+          ? curr.members.map((m) => (m.id === result.member.id ? result.member : m))
+          : [result.member, ...curr.members];
+        const count_by_role: Record<TeamRole, number> = { admin: 0, agent: 0, viewer: 0 };
+        for (const m of members) count_by_role[m.role]++;
+        return { members, count_by_role, total: members.length };
+      });
+
+      this.inviteOpen.set(false);
+    } catch (e: unknown) {
+      const status = (e as { status?: number })?.status;
+      this.inviteError.set(
+        status === 403 ? 'Sólo los admins pueden invitar.' :
+        status === 422 ? 'Datos inválidos. Revisá email + rol.' :
+        'No pudimos invitar a esa persona. Reintentá.'
+      );
+    } finally {
+      this.inviteSubmitting.set(false);
+    }
+  }
+
+  async copyPassword(): Promise<void> {
+    const pwd = this.lastInvite()?.temp_password;
+    if (!pwd) return;
+    try {
+      await navigator.clipboard.writeText(pwd);
+      this.passwordCopied.set(true);
+      setTimeout(() => this.passwordCopied.set(false), 2000);
+    } catch {
+      // Browser blocked clipboard (e.g. http origin); user can select manually.
+    }
+  }
+
+  dismissLastInvite(): void {
+    this.lastInvite.set(null);
   }
 }
