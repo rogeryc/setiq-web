@@ -78,9 +78,22 @@
 .s-mast { display: flex; align-items: center; padding: 14px 32px; border-bottom: 1px solid var(--rule); gap: 18px; flex-shrink: 0; }
 .s-mark { font-weight: 700; font-size: 19px; letter-spacing: -0.04em; color: var(--ink); }
 .s-mark em { color: var(--acc-bright); }
-.s-tenant { display: flex; align-items: center; gap: 9px; padding: 6px 12px 6px 10px; border: 1px solid var(--rule-strong); border-radius: 999px; background: var(--card); font-size: 12.5px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.s-tenant { display: flex; align-items: center; gap: 9px; padding: 6px 12px 6px 10px; border: 1px solid var(--rule-strong); border-radius: 999px; background: var(--card); color: var(--ink); font: inherit; font-size: 12.5px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.s-tenant:hover { background: var(--card-2); }
+.s-tenant.single { cursor: default; }
+.s-tenant.single:hover { background: var(--card); }
+.s-tenant[disabled] { opacity: 0.6; cursor: progress; }
 .s-tenant .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pos); }
 .s-tenant .caret { color: var(--soft); font-size: 10px; margin-left: 2px; }
+.s-tenant-wrap { position: relative; }
+.s-tenant-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 240px; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.20); padding: 6px; z-index: 100; }
+.s-tenant-menu-head { display: block; padding: 6px 10px 8px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--rule); margin-bottom: 4px; }
+.s-tenant-menu-item { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 8px 10px; font: inherit; font-size: 12.5px; background: none; border: none; cursor: pointer; color: var(--ink); border-radius: 7px; }
+.s-tenant-menu-item:hover { background: var(--card-2); }
+.s-tenant-menu-item.active { background: var(--acc-soft); }
+.s-tenant-menu-item strong { font-weight: 600; flex: 1; }
+.s-tenant-menu-item span { font-size: 10.5px; color: var(--muted); text-transform: capitalize; }
+.s-tenant-menu-check { color: var(--acc-bright); font-weight: 700; }
 .s-mast-spacer { flex: 1; }
 .s-mast-meta { font-size: 12px; color: var(--muted); display: flex; gap: 16px; align-items: center; white-space: nowrap; }
 .s-mast-meta > span { white-space: nowrap; }

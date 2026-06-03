@@ -55,6 +55,25 @@ export class AuthService {
     return Promise.resolve();
   }
 
+  /**
+   * Reissue the current session against a different tenant the user
+   * already belongs to. Stores the new token in whichever storage held
+   * the old one (preserves remember-me semantics).
+   */
+  async switchTenant(tenantId: string): Promise<void> {
+    const resp = await firstValueFrom(
+      this.http.post<ApiTokenResponse>(`${API_BASE}/auth/switch-tenant`, {
+        tenant_id: tenantId,
+      }),
+    );
+    this.token.set(resp.access_token);
+    if (this.isBrowser) {
+      const wasLocal = localStorage.getItem(STORAGE_KEY) !== null;
+      const store = wasLocal ? localStorage : sessionStorage;
+      store.setItem(STORAGE_KEY, resp.access_token);
+    }
+  }
+
   logout(): void {
     this.token.set(null);
     if (this.isBrowser) {

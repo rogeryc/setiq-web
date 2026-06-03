@@ -102,6 +102,13 @@ export interface ApiTenantDetail extends ApiTenantInfo {
   settings: Record<string, unknown>;
 }
 
+export interface ApiTenantMembership {
+  id: string;
+  slug: string;
+  name: string;
+  role: 'admin' | 'agent' | 'viewer';
+}
+
 export interface ApiUserMe {
   id: string;
   email: string;
@@ -109,6 +116,7 @@ export interface ApiUserMe {
   initials: string;
   role: 'admin' | 'agent' | 'viewer';
   tenant: ApiTenantInfo;
+  available_tenants: ApiTenantMembership[];
 }
 
 export type GroupBy = 'intent' | 'channel' | 'sentiment' | 'thread';

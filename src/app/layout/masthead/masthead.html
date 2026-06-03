@@ -1,9 +1,32 @@
 <header class="s-mast">
   <span class="s-mark">setiq<em>.</em></span>
-  <button class="s-tenant" type="button">
-    <span class="dot"></span>{{ tenantLabel() }}
-    <app-icon name="chevron-down" [size]="12" />
-  </button>
+  <div class="s-tenant-wrap">
+    <button class="s-tenant"
+            type="button"
+            [class.single]="!canSwitchTenant()"
+            [disabled]="switching()"
+            (click)="toggleTenantMenu()">
+      <span class="dot"></span>{{ tenantLabel() }}
+      @if (canSwitchTenant()) {
+        <app-icon name="chevron-down" [size]="12" />
+      }
+    </button>
+    @if (tenantMenuOpen()) {
+      <div class="s-tenant-menu" role="menu">
+        <span class="s-tenant-menu-head">Cambiar inquilino</span>
+        @for (t of availableTenants(); track t.id) {
+          <button type="button"
+                  class="s-tenant-menu-item"
+                  [class.active]="t.id === currentTenantId()"
+                  (click)="pickTenant(t.id)">
+            <strong>{{ t.name }}</strong>
+            <span>{{ t.role }}</span>
+            @if (t.id === currentTenantId()) { <span class="s-tenant-menu-check">✓</span> }
+          </button>
+        }
+      </div>
+    }
+  </div>
   <div class="s-mast-spacer"></div>
   <div class="s-mast-meta">
     <span [title]="'Hora local Bolivia. Datos al cargar la página.'">{{ nowLabel() }}</span>
