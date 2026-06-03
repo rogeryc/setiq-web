@@ -66,6 +66,14 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": [
+              "satchel-huff-silliness.ngrok-free.dev",
+              ".ngrok-free.dev",
+              ".ngrok-free.app",
+              "localhost"
+            ]
+          },
           "configurations": {
             "production": {
               "buildTarget": "setiq-web:build:production"
