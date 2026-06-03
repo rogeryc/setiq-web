@@ -6,7 +6,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { ApiTokenResponse } from './types';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '';
 const STORAGE_KEY = 'setiq_token';
 
 @Injectable({ providedIn: 'root' })

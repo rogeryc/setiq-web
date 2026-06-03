@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
 import { ApiCompetitorActivityResponse, ApiOverviewResponse } from './types';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '';
 
 @Injectable({ providedIn: 'root' })
 export class OverviewService {

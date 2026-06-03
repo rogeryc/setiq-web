@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { ApiUserMe } from './types';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '';
 
 /**
  * Caches the current /auth/me response. Single shared singleton so the

@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
 import { ApiInsightsResponse, InsightKind } from './types';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '';
 
 type KindFilter = InsightKind | 'all';
 

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '';
 
 interface ConnectResponse {
   url: string;

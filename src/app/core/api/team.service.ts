@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { ApiInviteRequest, ApiInviteResponse, ApiTeamResponse } from './types';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '';
 
 @Injectable({ providedIn: 'root' })
 export class TeamService {
