@@ -21,7 +21,8 @@
       </p>
 
       @if (loadError(); as err) {
-        <div class="aj-loaderr" role="alert">No pudimos cargar el inquilino: {{ err }}</div>
+        <app-empty-state state="error" [errorText]="err"
+          message="No pudimos cargar el inquilino." />
       }
 
       @if (saveError(); as err) {

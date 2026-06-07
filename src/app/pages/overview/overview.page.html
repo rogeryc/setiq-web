@@ -179,10 +179,12 @@
             }
           </div>
         } @else {
-          <div class="comp-empty">Sin actividad de competidores en el período.</div>
+          <app-empty-state state="empty"
+            message="Sin actividad de competidores en el período."
+            hint="Configurá tracked subjects en /segmentos para que SETIQ los monitoree." />
         }
       } @else {
-        <div class="comp-empty">Cargando actividad de competidores…</div>
+        <app-empty-state state="loading" message="Cargando actividad de competidores…" />
       }
     </section>
 

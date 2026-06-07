@@ -111,13 +111,17 @@
 
     <!-- Empty / loading / error -->
     @if (!data() && !error()) {
-      <div class="rec-empty">Cargando recomendaciones…</div>
+      <app-empty-state state="loading" message="Cargando recomendaciones…" />
     }
     @if (error(); as e) {
-      <div class="rec-empty error">Error: {{ e }}</div>
+      <app-empty-state state="error" [errorText]="e"
+        message="No pudimos cargar las recomendaciones."
+        actionLabel="Reintentar" (action)="reload()" />
     }
     @if (data() && lead() === null && featured().length === 0 && memos().length === 0) {
-      <div class="rec-empty">No hay recomendaciones en esta vista.</div>
+      <app-empty-state state="empty"
+        message="No hay recomendaciones en esta vista."
+        hint="Probá otro filtro arriba, o esperá a que SETIQ genere nuevas memos basadas en la actividad reciente." />
     }
 
   </div>

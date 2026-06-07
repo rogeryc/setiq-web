@@ -119,9 +119,15 @@
           </div>
         }
       } @else if (error()) {
-        <div class="seg-empty">Error: {{ error() }}</div>
+        <app-empty-state state="error" [errorText]="error()!"
+          message="No pudimos cargar los segmentos."
+          actionLabel="Reintentar" (action)="reload()" />
+      } @else if (data() && sections().length === 0) {
+        <app-empty-state state="empty"
+          message="No hay sujetos con esos filtros."
+          hint="Probá la pestaña 'Todos' arriba, o agregá un nuevo sujeto." />
       } @else {
-        <div class="seg-empty">Cargando segmentos…</div>
+        <app-empty-state state="loading" message="Cargando segmentos…" />
       }
     </section>
 

@@ -6,6 +6,7 @@ import { OverviewService } from '../../core/api/overview.service';
 import { ApiCompetitorActivity, ApiOverviewResponse } from '../../core/api/types';
 import { ChartCardComponent } from '../../shared/chart-card/chart-card';
 import { DonutChartComponent, DonutSegment } from '../../shared/donut-chart/donut-chart';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state';
 import { FeaturedRecCardComponent } from '../../shared/featured-rec-card/featured-rec-card';
 import { KpiCardComponent } from '../../shared/kpi-card/kpi-card';
 import { MemoCardComponent } from '../../shared/memo-card/memo-card';
@@ -29,6 +30,7 @@ const CHANNEL_COLORS: Record<string, string> = {
     ChartCardComponent,
     DonutChartComponent,
     MemoCardComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './overview.page.html',
   styleUrl: './overview.page.scss',

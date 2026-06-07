@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { TrackedSubjectsService } from '../../core/api/tracked-subjects.service';
 import { ApiTrackedSubject, ApiTrackedSubjectDetail, SubjectKind } from '../../core/api/types';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state';
 
 interface KindSection {
   kind: SubjectKind;
@@ -42,7 +43,7 @@ type Filter = SubjectKind | 'all';
 
 @Component({
   selector: 'app-segmentos-page',
-  imports: [FormsModule],
+  imports: [FormsModule, EmptyStateComponent],
   templateUrl: './segmentos.page.html',
   styleUrl: './segmentos.page.scss',
 })
@@ -113,6 +114,11 @@ export class SegmentosPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     if (!this.isBrowser) return;
+    await this.reload();
+  }
+
+  async reload(): Promise<void> {
+    this.error.set(null);
     try {
       const list = await this.service.list();
       this.data.set(list);

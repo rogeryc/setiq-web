@@ -3,6 +3,7 @@ import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angul
 import { FormsModule } from '@angular/forms';
 
 import { TeamService } from '../../core/api/team.service';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state';
 import { ApiInviteResponse, ApiTeamMember, ApiTeamResponse, TeamRole } from '../../core/api/types';
 
 type Filter = TeamRole | 'all';
@@ -27,7 +28,7 @@ const DATE_FORMAT = new Intl.DateTimeFormat('es-BO', {
 
 @Component({
   selector: 'app-equipo-page',
-  imports: [FormsModule],
+  imports: [FormsModule, EmptyStateComponent],
   templateUrl: './equipo.page.html',
   styleUrl: './equipo.page.scss',
 })
@@ -77,6 +78,11 @@ export class EquipoPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     if (!this.isBrowser) return;
+    await this.reload();
+  }
+
+  async reload(): Promise<void> {
+    this.error.set(null);
     try {
       this.data.set(await this.service.list());
     } catch (e) {

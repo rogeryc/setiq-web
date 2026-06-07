@@ -3,6 +3,7 @@ import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angul
 
 import { InsightsService } from '../../core/api/insights.service';
 import { ApiInsight, ApiInsightsResponse, InsightKind } from '../../core/api/types';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state';
 import { FeaturedRecCardComponent } from '../../shared/featured-rec-card/featured-rec-card';
 import { MemoCardComponent } from '../../shared/memo-card/memo-card';
 
@@ -10,7 +11,7 @@ type Filter = InsightKind | 'all';
 
 @Component({
   selector: 'app-recomendaciones-page',
-  imports: [FeaturedRecCardComponent, MemoCardComponent],
+  imports: [FeaturedRecCardComponent, MemoCardComponent, EmptyStateComponent],
   templateUrl: './recomendaciones.page.html',
   styleUrl: './recomendaciones.page.scss',
 })
@@ -54,6 +55,11 @@ export class RecomendacionesPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     if (!this.isBrowser) return;
+    await this.reload();
+  }
+
+  async reload(): Promise<void> {
+    this.error.set(null);
     try {
       this.data.set(await this.service.list());
     } catch (e) {

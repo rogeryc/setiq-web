@@ -109,9 +109,11 @@
           }
         </div>
       } @else if (error()) {
-        <div class="eq-empty error">Error: {{ error() }}</div>
+        <app-empty-state state="error" [errorText]="error()!"
+          message="No pudimos cargar el equipo."
+          actionLabel="Reintentar" (action)="reload()" />
       } @else {
-        <div class="eq-empty">Cargando equipo…</div>
+        <app-empty-state state="loading" message="Cargando equipo…" />
       }
     </section>
 

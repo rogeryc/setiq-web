@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { ApiTenantDetail } from '../../core/api/types';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state';
 import { TenantsService } from '../../core/api/tenants.service';
 
 interface SettingRow {
@@ -49,7 +50,7 @@ const CHANNEL_LABEL_DEFAULTS = {
 
 @Component({
   selector: 'app-ajustes-page',
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, EmptyStateComponent],
   templateUrl: './ajustes.page.html',
   styleUrl: './ajustes.page.scss',
   encapsulation: ViewEncapsulation.None,
