@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="es-BO">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Política de Privacidad — SETIQ</title>
+  <meta name="description" content="Cómo SETIQ recoge, usa, comparte y protege los datos personales que procesa en nombre de sus inquilinos.">
+  <style>
+    :root {
+      --ink: #0F131D;
+      --ink-2: #3A4252;
+      --muted: #6B7488;
+      --bg: #FFFFFF;
+      --card: #F7F8FB;
+      --rule: #E4E8F0;
+      --acc: #2E5DA6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--ink-2);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 56px 24px 96px;
+    }
+    .head {
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .brand em { color: var(--acc); font-style: normal; }
+    h1 {
+      margin: 28px 0 6px;
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1.15;
+    }
+    .meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    h2 {
+      margin: 44px 0 12px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+    }
+    h3 {
+      margin: 24px 0 6px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    p { margin: 0 0 14px; }
+    ul { margin: 0 0 18px; padding-left: 20px; }
+    li { margin-bottom: 6px; }
+    a { color: var(--acc); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, .mono {
+      font-family: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+      font-size: 0.92em;
+      background: var(--card);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--ink);
+    }
+    .lede {
+      font-size: 17px;
+      color: var(--ink-2);
+      margin-bottom: 28px;
+    }
+    .callout {
+      background: var(--card);
+      border-left: 3px solid var(--acc);
+      padding: 14px 18px;
+      margin: 22px 0;
+      border-radius: 4px;
+      font-size: 14.5px;
+    }
+    .foot {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--rule);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #F2F4F8;
+        --ink-2: #C9CFDB;
+        --muted: #8E97AB;
+        --bg: #0B0E16;
+        --card: #161A26;
+        --rule: rgba(255,255,255,0.08);
+        --acc: #6E9CD9;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <a href="/" class="brand">setiq<em>.</em></a>
+      <h1>Política de Privacidad</h1>
+      <div class="meta">Última actualización: 3 de junio de 2026 · Aplica a setiq.bo y todas las apps relacionadas.</div>
+    </header>
+
+    <p class="lede">
+      SETIQ es una plataforma SaaS multi-inquilino que centraliza conversaciones de redes
+      sociales para empresas e influencers. Este documento explica qué datos recogemos, por
+      qué los necesitamos, con quién los compartimos y cómo podés ejercer tus derechos.
+    </p>
+
+    <h2>1. ¿Quién opera SETIQ?</h2>
+    <p>
+      SETIQ es operado por un equipo basado en Bolivia. Hasta la incorporación formal de la
+      empresa, el responsable del tratamiento es <strong>Roger Vaca</strong>
+      (<a href="mailto:legal@setiq.bo">legal@setiq.bo</a>). Cuando la empresa se incorpore
+      formalmente, actualizaremos este documento con el NIT y la razón social.
+    </p>
+
+    <h2>2. Datos que recogemos</h2>
+
+    <h3>2.1 De inquilinos (cuentas de SETIQ)</h3>
+    <ul>
+      <li>Nombre, correo electrónico y contraseña (almacenada como hash bcrypt).</li>
+      <li>Rol dentro del inquilino (admin / agente / lector).</li>
+      <li>Configuración del inquilino: módulos activados, política de IA, etiquetas de canales.</li>
+      <li>Registros técnicos: timestamps de login, dirección IP del último acceso.</li>
+    </ul>
+
+    <h3>2.2 De cuentas de Meta conectadas (Facebook + Instagram)</h3>
+    <p>
+      Cuando un inquilino conecta sus páginas de Facebook o cuentas de Instagram Business mediante
+      el flujo OAuth de Meta, SETIQ recibe y almacena:
+    </p>
+    <ul>
+      <li>Mensajes directos enviados a esas cuentas.</li>
+      <li>Comentarios públicos en las publicaciones de esas cuentas.</li>
+      <li>Datos públicos del autor del mensaje/comentario: nombre o handle, foto de perfil, ID interno de Meta.</li>
+      <li>Metadatos del contenido: timestamp, tipo (comentario / DM / mención), URL de origen.</li>
+      <li>Tokens de acceso de las páginas conectadas (cifrados en reposo).</li>
+    </ul>
+
+    <h3>2.3 De menciones públicas en redes (sólo si está activado)</h3>
+    <p>
+      Si el inquilino activa el monitoreo de menciones, SETIQ recoge posts y comentarios públicos
+      que mencionen las cuentas, hashtags o keywords configurados por el inquilino, usando el
+      proveedor Apify. Sólo se ingestan datos que ya son públicos en la plataforma de origen.
+    </p>
+
+    <h2>3. Cómo usamos los datos</h2>
+    <ul>
+      <li>Mostrar al inquilino una vista unificada de sus conversaciones.</li>
+      <li>
+        Clasificar automáticamente cada mensaje (sentimiento, intención, prioridad) usando un
+        modelo de lenguaje provisto por Anthropic (Claude). El contenido del mensaje es enviado
+        al proveedor de IA bajo un acuerdo de tratamiento de datos.
+      </li>
+      <li>Generar recomendaciones y agregados estadísticos para el inquilino.</li>
+      <li>Operar el servicio: autenticar usuarios, asegurar la cuenta, prevenir abuso.</li>
+      <li>Cumplir obligaciones legales aplicables en Bolivia.</li>
+    </ul>
+    <p>
+      <strong>No usamos los datos para publicidad ni los vendemos a terceros</strong>. No
+      entrenamos modelos de IA propios con el contenido de los mensajes.
+    </p>
+
+    <h2>4. Con quién compartimos los datos</h2>
+    <ul>
+      <li>
+        <strong>Anthropic (Claude API)</strong> — proveedor del modelo de IA que clasifica mensajes.
+        Anthropic se compromete contractualmente a no usar el contenido para entrenamiento.
+      </li>
+      <li>
+        <strong>Meta (Facebook + Instagram)</strong> — para enviar respuestas a mensajes/comentarios
+        cuando el inquilino lo solicita explícitamente desde SETIQ.
+      </li>
+      <li>
+        <strong>Apify</strong> — sólo si el inquilino activa monitoreo de menciones públicas.
+        Apify nos provee data scraping de redes sociales.
+      </li>
+      <li>
+        <strong>Proveedores de infraestructura</strong> — Hetzner (hosting), Backblaze B2 (backups),
+        Sentry / Logtail (observabilidad). Bajo contratos estándar de procesamiento.
+      </li>
+    </ul>
+    <p>
+      <strong>Nunca compartimos datos con otros inquilinos.</strong> La arquitectura de SETIQ usa
+      Row Level Security en la base de datos para asegurar el aislamiento por inquilino.
+    </p>
+
+    <h2>5. Tus derechos</h2>
+    <p>Como titular de datos personales, tenés derecho a:</p>
+    <ul>
+      <li><strong>Acceso</strong> — pedirnos copia de los datos que tenemos sobre vos.</li>
+      <li><strong>Rectificación</strong> — corregir datos inexactos.</li>
+      <li><strong>Eliminación</strong> — solicitar el borrado de tus datos (ver sección 7).</li>
+      <li><strong>Oposición</strong> — pedir que dejemos de procesar tus datos.</li>
+      <li><strong>Portabilidad</strong> — recibir tus datos en formato estructurado y legible.</li>
+      <li><strong>Revocar consentimiento</strong> — en cualquier momento, sin perjuicio del procesamiento previo.</li>
+    </ul>
+    <p>
+      Para ejercer cualquiera de estos derechos, escribinos a
+      <a href="mailto:privacy@setiq.bo">privacy@setiq.bo</a>. Respondemos dentro de los 30 días.
+    </p>
+
+    <h2>6. Conservación de datos</h2>
+    <ul>
+      <li>Cuentas de SETIQ: mientras la cuenta esté activa, más 90 días tras la cancelación.</li>
+      <li>Mensajes y conversaciones: indefinido por defecto, configurable por inquilino.</li>
+      <li>Logs de webhooks: 30 días.</li>
+      <li>Backups: 30 días, encriptados.</li>
+      <li>Registros legales y contables: por el plazo que exija la ley boliviana.</li>
+    </ul>
+
+    <h2>7. Cómo eliminar tus datos</h2>
+    <div class="callout">
+      Si querés que SETIQ elimine la información que tiene sobre vos, seguí las instrucciones en
+      <a href="/assets/legal/data-deletion.html">nuestra guía de eliminación de datos</a>.
+    </div>
+
+    <h2>8. Seguridad</h2>
+    <p>Aplicamos medidas técnicas y organizativas razonables:</p>
+    <ul>
+      <li>Encriptación en tránsito (TLS 1.3) y en reposo (AES-256).</li>
+      <li>Contraseñas almacenadas como hash bcrypt.</li>
+      <li>Tokens de Meta almacenados encriptados.</li>
+      <li>Aislamiento por inquilino vía Row Level Security en PostgreSQL.</li>
+      <li>Acceso al backend restringido por roles, con autenticación de dos factores para admins.</li>
+      <li>Backups encriptados y testeo regular de restauración.</li>
+    </ul>
+
+    <h2>9. Menores de edad</h2>
+    <p>
+      SETIQ no está dirigido a menores de 18 años y no recoge datos de menores conscientemente. Si
+      sos padre o tutor y creés que un menor nos proporcionó datos, contactanos para eliminarlos.
+    </p>
+
+    <h2>10. Transferencias internacionales</h2>
+    <p>
+      Nuestros proveedores (Anthropic, Hetzner, Apify, Meta) operan principalmente fuera de Bolivia.
+      Las transferencias se basan en cláusulas contractuales estándar y, donde aplica, en el marco
+      de protección de datos de la jurisdicción del proveedor (GDPR en EU, etc.).
+    </p>
+
+    <h2>11. Cookies</h2>
+    <p>
+      SETIQ usa únicamente cookies técnicas necesarias para mantener tu sesión iniciada. No usamos
+      cookies de análisis ni publicidad de terceros.
+    </p>
+
+    <h2>12. Cambios a esta política</h2>
+    <p>
+      Cuando hagamos cambios significativos, notificaremos por correo a los administradores de cada
+      inquilino con al menos 30 días de anticipación. La versión más actual siempre está disponible
+      en esta URL.
+    </p>
+
+    <h2>13. Contacto</h2>
+    <p>
+      Para consultas sobre esta política, ejercer derechos, o reportar un incidente de seguridad:
+    </p>
+    <ul>
+      <li>Email general: <a href="mailto:legal@setiq.bo">legal@setiq.bo</a></li>
+      <li>Privacidad: <a href="mailto:privacy@setiq.bo">privacy@setiq.bo</a></li>
+      <li>Seguridad: <a href="mailto:security@setiq.bo">security@setiq.bo</a></li>
+    </ul>
+
+    <div class="foot">
+      © 2026 SETIQ · Esta política se rige por las leyes de Bolivia.
+    </div>
+  </div>
+</body>
+</html>
