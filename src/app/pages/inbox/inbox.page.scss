@@ -169,6 +169,50 @@
   gap: 10px;
 }
 
+// --- Reply composer ---
+.s-reply {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.s-reply-input {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 8px;
+  background: var(--card-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  resize: vertical;
+  min-height: 56px;
+  max-height: 200px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--acc);
+    box-shadow: 0 0 0 3px var(--acc-soft);
+  }
+
+  &[disabled] { opacity: 0.5; }
+}
+
+.s-reply-send {
+  padding: 9px 18px;
+}
+
+.s-reply-error {
+  background: rgba(229, 69, 69, 0.10);
+  border: 1px solid rgba(229, 69, 69, 0.35);
+  color: var(--neg);
+  padding: 7px 11px;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .s-conv-status {
   font-size: 11px;
   text-transform: uppercase;

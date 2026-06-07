@@ -197,7 +197,22 @@
               <span class="s-assigned">✓ Asignado a {{ al }}</span>
             }
           </div>
-          <span class="sub">Responder se hace desde las apps oficiales por ahora.</span>
+          <div class="s-reply">
+            <textarea class="s-reply-input"
+                      placeholder="Escribí una respuesta…"
+                      [ngModel]="replyText()"
+                      (ngModelChange)="replyText.set($event)"
+                      [disabled]="replying() || sel.status === 'resolved'"
+                      rows="2"></textarea>
+            <button type="button" class="s-btn acc s-reply-send"
+                    (click)="sendReply()"
+                    [disabled]="replying() || !replyText().trim() || sel.status === 'resolved'">
+              {{ replying() ? 'Enviando…' : 'Enviar' }}
+            </button>
+          </div>
+          @if (replyError(); as err) {
+            <div class="s-reply-error" role="alert">{{ err }}</div>
+          }
         </footer>
       } @else {
         <div class="conv-empty large">

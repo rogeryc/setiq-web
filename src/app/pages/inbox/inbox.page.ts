@@ -249,6 +249,40 @@ export class InboxPage implements OnInit {
     }
   }
 
+  // --- Reply (Kaizen write feature, gated on Meta App Review) -----------
+
+  protected readonly replyText = signal('');
+  protected readonly replying = signal(false);
+  protected readonly replyError = signal<string | null>(null);
+
+  async sendReply(): Promise<void> {
+    const id = this.selectedId();
+    const text = this.replyText().trim();
+    if (!id || !text || this.replying()) return;
+    this.replying.set(true);
+    this.replyError.set(null);
+    try {
+      const res = await this.service.reply(id, text);
+      // Optimistically append the new message to the open detail.
+      this.detail.update((d) => {
+        if (!d || d.id !== id) return d;
+        return { ...d, messages: [...d.messages, res.message] };
+      });
+      this.replyText.set('');
+    } catch (e: unknown) {
+      const err = e as { status?: number; error?: { detail?: string } };
+      const detail = err.error?.detail;
+      this.replyError.set(
+        err.status === 412 ? 'Conectá una página de Meta en /canales antes de responder.' :
+        err.status === 501 ? 'Este canal no soporta respuesta automática todavía.' :
+        err.status === 502 ? `Meta rechazó: ${detail ?? 'permisos no aprobados'}` :
+        detail ?? 'No pudimos enviar la respuesta.'
+      );
+    } finally {
+      this.replying.set(false);
+    }
+  }
+
   private async loadList(g: GroupBy): Promise<void> {
     this.loading.set(true);
     try {

@@ -7,8 +7,14 @@ import {
   ApiConversationDetail,
   ApiConversationMutation,
   ApiConversationsResponse,
+  ApiMessageDetail,
   GroupBy,
 } from './types';
+
+interface ReplyResponse {
+  message: ApiMessageDetail;
+  external_id?: string;
+}
 
 const API_BASE = '';
 
@@ -44,6 +50,13 @@ export class ConversationsService {
     await this.auth.ensureLoggedIn();
     return firstValueFrom(
       this.http.patch<ApiConversationMutation>(`${API_BASE}/conversations/${id}`, body),
+    );
+  }
+
+  async reply(id: string, text: string): Promise<ReplyResponse> {
+    await this.auth.ensureLoggedIn();
+    return firstValueFrom(
+      this.http.post<ReplyResponse>(`${API_BASE}/conversations/${id}/reply`, { text }),
     );
   }
 }
