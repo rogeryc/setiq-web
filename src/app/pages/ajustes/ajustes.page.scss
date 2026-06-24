@@ -2,6 +2,10 @@
 
 app-ajustes-page { display: contents; }
 
+@media (max-width: 720px) {
+  .aj-grid { grid-template-columns: 1fr !important; }
+}
+
 .aj-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));

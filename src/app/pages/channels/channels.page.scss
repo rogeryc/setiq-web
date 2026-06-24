@@ -3,6 +3,13 @@
 
 :host { display: contents; }
 
+@media (max-width: 720px) {
+  // The 6-column channels table can't fit a phone; let it scroll horizontally
+  // so every column + control stays usable.
+  .s-channels-table { overflow-x: auto; }
+  .s-channels-table .row { min-width: 660px; }
+}
+
 .s-channels-table {
   .row.dim {
     opacity: 0.55;
