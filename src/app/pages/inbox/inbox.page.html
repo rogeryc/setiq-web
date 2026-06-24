@@ -5,7 +5,7 @@
         message="Hubo un problema con el inbox." />
     </div>
   }
-  <div class="s-inbox s-inbox-2col">
+  <div class="s-inbox s-inbox-2col" [class.show-detail]="mobileShowDetail()">
 
     <!-- Left rail: grouping toggle + grouped conversation list -->
     <aside class="s-inbox-list">
@@ -102,12 +102,11 @@
                       @if (c.sentiment) {
                         <span class="tag" [class.pos]="sentimentTone(c.sentiment) === 'pos'"
                                           [class.neg]="sentimentTone(c.sentiment) === 'neg'">
-                          {{ c.sentiment === 'positive' ? 'positivo' :
-                             c.sentiment === 'negative' ? 'negativo' : 'neutral' }}
+                          {{ sentimentLabel(c.sentiment) }}
                         </span>
                       }
                       @if (c.intent && c.intent !== 'other') {
-                        <span class="tag">{{ c.intent }}</span>
+                        <span class="tag">{{ intentLabel(c.intent) }}</span>
                       }
                       @if (c.message_count > 1) {
                         <span class="tag muted">{{ c.message_count }} mensajes</span>
@@ -128,6 +127,9 @@
     <section class="s-detail">
       @if (selectedConversation(); as sel) {
         <header class="s-detail-head">
+          <button type="button" class="s-mobile-back" (click)="backToList()">
+            ← Conversaciones
+          </button>
           <div class="who">
             <div class="s-avatar" style="width:38px;height:38px;font-size:13.5px">
               {{ (sel.contact_name || sel.contact_handle).substring(0, 2).toUpperCase() }}
@@ -139,16 +141,16 @@
           </div>
           <div class="meta">
             @if (sel.intent && sel.intent !== 'other') {
-              <span>Intent: <b>{{ sel.intent }}</b></span>
+              <span>Intención: <b>{{ intentLabel(sel.intent) }}</b></span>
             }
             @if (sel.sentiment) {
               <span>Sentimiento: <b
                 [style.color]="sel.sentiment === 'negative' ? 'var(--neg)' :
                                 sel.sentiment === 'positive' ? 'var(--pos)' : 'inherit'">
-                {{ sel.sentiment }}</b></span>
+                {{ sentimentLabel(sel.sentiment) }}</b></span>
             }
             @if (sel.priority) {
-              <span>Prioridad: <b>{{ sel.priority }}</b></span>
+              <span>Prioridad: <b>{{ priorityLabel(sel.priority) }}</b></span>
             }
             @if (sel.subject) {
               <span>Hilo: <b>{{ sel.subject }}</b></span>

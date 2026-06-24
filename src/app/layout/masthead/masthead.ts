@@ -45,7 +45,7 @@ export class MastheadComponent implements OnInit {
 
   readonly nowLabel = computed(() => {
     const at = this.overview.lastFetchedAt();
-    return at ? TIME_FORMAT.format(at) : '— actualizando…';
+    return at ? TIME_FORMAT.format(at) : '';
   });
 
   ngOnInit(): void {

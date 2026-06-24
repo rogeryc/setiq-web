@@ -3,6 +3,11 @@
 
 :host { display: contents; }
 
+@media (max-width: 720px) {
+  .seg-stats { grid-template-columns: 1fr !important; }
+  .seg-field-row { grid-template-columns: 1fr !important; }
+}
+
 .seg-hero {
   .seg-stats {
     display: grid;
