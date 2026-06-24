@@ -2,6 +2,10 @@
 
 :host { display: contents; }
 
+@media (max-width: 720px) {
+  .eq-stats { grid-template-columns: 1fr !important; }
+}
+
 .eq-hero {
   .eq-stats {
     display: grid;

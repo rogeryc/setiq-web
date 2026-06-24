@@ -7,14 +7,42 @@
 @media (max-width: 860px) {
   .s-inbox-2col {
     grid-template-columns: 1fr !important;
-    height: auto !important;
-    overflow: visible !important;
+    height: 100% !important;
+    overflow: hidden !important;
   }
   .s-inbox-list {
     border-right: none;
-    border-bottom: 1px solid var(--rule);
-    max-height: 50vh;
   }
+  // Show one pane at a time: list by default, detail when a conversation
+  // is selected (tap a conversation → detail; "← Conversaciones" → back).
+  .s-inbox-2col.show-detail .s-inbox-list { display: none; }
+  .s-inbox-2col:not(.show-detail) .s-detail { display: none; }
+  .s-mobile-back { display: inline-flex !important; }
+}
+
+// Back button — only visible on mobile (shown via the media query above).
+.s-mobile-back {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: var(--acc-bright);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0 10px;
+}
+
+// Outbound (agent) messages: right-aligned with an accent background so the
+// thread clearly distinguishes who said what.
+.s-detail-thread .s-msg.outbound {
+  margin-left: auto;
+  background: var(--acc-soft);
+  border-radius: 12px 12px 4px 12px;
+
+  .t { color: var(--acc-bright); }
 }
 
 .s-inbox-2col {

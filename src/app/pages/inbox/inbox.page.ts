@@ -55,6 +55,8 @@ export class InboxPage implements OnInit {
   protected readonly members = signal<ApiTeamMember[]>([]);
   protected readonly actionBusy = signal<boolean>(false);
   protected readonly assignedLabel = signal<string | null>(null);
+  // Mobile: show the detail pane (list↔detail navigation under 860px).
+  protected readonly mobileShowDetail = signal<boolean>(false);
 
   // --- Client-side filters (sentiment + channel) ---
   protected readonly sentimentFilter = signal<'all' | 'positive' | 'neutral' | 'negative'>('all');
@@ -138,6 +140,7 @@ export class InboxPage implements OnInit {
 
   async selectConversation(id: string): Promise<void> {
     this.selectedId.set(id);
+    this.mobileShowDetail.set(true);
     this.detail.set(null);
     this.assignedLabel.set(null);
     try {
@@ -196,6 +199,38 @@ export class InboxPage implements OnInit {
     if (channel === 'email')             return 'email';
     if (channel === 'whatsapp')          return 'whatsapp';
     return 'web';
+  }
+
+  backToList(): void {
+    this.mobileShowDetail.set(false);
+  }
+
+  intentLabel(intent: string | undefined): string {
+    if (!intent) return '';
+    const map: Record<string, string> = {
+      complaint: 'Queja',
+      praise: 'Elogio',
+      question: 'Consulta',
+      purchase_intent: 'Oportunidad',
+      support_request: 'Soporte',
+      spam: 'Spam',
+      other: 'Otro',
+    };
+    return map[intent] ?? intent;
+  }
+
+  sentimentLabel(sentiment: string | undefined): string {
+    return sentiment === 'positive' ? 'Positivo'
+      : sentiment === 'negative' ? 'Negativo'
+      : sentiment === 'neutral' ? 'Neutral'
+      : (sentiment ?? '');
+  }
+
+  priorityLabel(priority: string | undefined): string {
+    const map: Record<string, string> = {
+      low: 'Baja', medium: 'Media', high: 'Alta', urgent: 'Urgente',
+    };
+    return priority ? (map[priority] ?? priority) : '';
   }
 
   sentimentTone(sentiment: string | undefined): 'pos' | 'neg' | 'neutral' | '' {
