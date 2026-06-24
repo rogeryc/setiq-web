@@ -404,8 +404,9 @@ body { min-height: 100vh; }
   .s-hero-kpis { grid-template-columns: 1fr; }
   .s-admin-main { padding: 20px 16px; }
   /* iOS auto-zooms when focusing a field with font-size < 16px. Force 16px
-     on mobile so the keyboard opening doesn't zoom the page. */
-  input, textarea, select { font-size: 16px; }
+     on mobile so the keyboard opening doesn't zoom the page. !important so it
+     beats component-scoped input styles (e.g. .s-reply-input) by specificity. */
+  input, textarea, select { font-size: 16px !important; }
 }
 
 /* Generic modal primitives — used by any page-level modal. */

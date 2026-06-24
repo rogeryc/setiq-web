@@ -4,6 +4,14 @@
 
 :host { display: contents; }
 
+// iOS zooms on focus when a field is < 16px. The reply textarea (.s-reply-input,
+// 13px) and the reassign select (12px) are component-scoped so they beat the
+// global 16px rule — override them here on mobile.
+@media (max-width: 720px) {
+  .s-reply-input { font-size: 16px !important; }
+  .s-reassign { font-size: 16px !important; }
+}
+
 @media (max-width: 860px) {
   .s-inbox-2col {
     grid-template-columns: 1fr !important;
