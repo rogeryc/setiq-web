@@ -106,6 +106,31 @@
           }
         </article>
 
+        <!-- Editable: Voz de marca (feeds the AI reply drafter) -->
+        <article class="s-set-card aj-card">
+          <header class="aj-card-head">
+            <h3>Voz de marca</h3>
+            @if (isSaving('ai_voice.description')) { <span class="aj-saving">guardando…</span> }
+            @else if (isSaved('ai_voice.description')) { <span class="aj-saved">✓ guardado</span> }
+          </header>
+          <p class="s">
+            Describí cómo suena tu marca cuando responde. La IA usa esto para
+            redactar borradores en el inbox ("✨ Sugerir"). Ejemplos: tuteo,
+            humor sutil, evitá jerga, saludos, cierre, temas prohibidos.
+          </p>
+
+          <textarea class="s-input aj-voice-input"
+                    rows="6"
+                    maxlength="600"
+                    placeholder="Ej: Tuteamos siempre, evitamos jerga corporativa. Somos empáticos con las quejas pero firmes con datos verificados. Nunca prometemos plazos ni descuentos. Firmamos 'Equipo Thalma' en DMs."
+                    [ngModel]="aiVoiceDescription()"
+                    (ngModelChange)="onAiVoiceChange($event)"></textarea>
+
+          <p class="aj-footnote">
+            Máximo 600 caracteres. Vacío = tono neutro empático.
+          </p>
+        </article>
+
         <!-- Editable: Etiquetas de canales -->
         <article class="s-set-card aj-card">
           <header class="aj-card-head">
