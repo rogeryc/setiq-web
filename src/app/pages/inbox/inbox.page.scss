@@ -162,6 +162,12 @@
     border: 1px solid var(--rule);
   }
 
+  .tags .tag.resolved {
+    color: var(--pos);
+    border: 1px solid var(--pos);
+    background: transparent;
+  }
+
   .ch-avatar {
     margin-right: 4px;
   }
@@ -169,6 +175,16 @@
   &.active .ch-avatar,
   &:hover .ch-avatar {
     border-color: currentColor;
+  }
+
+  // Resolved rows dim so the still-open ones jump out at a glance.
+  &.resolved:not(.active) {
+    .body .top .name,
+    .body .sn {
+      color: var(--muted);
+    }
+    .pri { opacity: 0.4; }
+    .ch-avatar { opacity: 0.6; }
   }
 }
 
