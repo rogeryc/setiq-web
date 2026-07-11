@@ -156,6 +156,17 @@
   // Override default cursor; we use (click) so it should look clickable.
   cursor: pointer;
 
+  // Global .s-conv .tags is a single-line flex; that breaks the last chip
+  // mid-word when the row is tight (see e.g. "3 MENSAJES" wrapping). Let it
+  // wrap onto a second row instead, and keep each chip whole.
+  .tags {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  .tags .tag {
+    white-space: nowrap;
+  }
+
   .tags .tag.muted {
     color: var(--muted);
     background: var(--card);
