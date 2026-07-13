@@ -56,10 +56,18 @@
 
               <div class="rec-hero-actions">
                 @if (primaryAction(h.actions); as p) {
-                  <a [routerLink]="p.route" class="rec-btn rec-btn-primary">{{ p.label }}</a>
+                  @if (p.route) {
+                    <a [routerLink]="p.route" class="rec-btn rec-btn-primary">{{ p.label }}</a>
+                  } @else {
+                    <button type="button" class="rec-btn rec-btn-primary" title="Próximamente">{{ p.label }}</button>
+                  }
                 }
                 @if (secondaryAction(h.actions); as s) {
-                  <a [routerLink]="s.route" class="rec-btn rec-btn-outline">{{ s.label }}</a>
+                  @if (s.route) {
+                    <a [routerLink]="s.route" class="rec-btn rec-btn-outline">{{ s.label }}</a>
+                  } @else {
+                    <button type="button" class="rec-btn rec-btn-outline" title="Próximamente">{{ s.label }}</button>
+                  }
                 }
                 <button type="button" class="rec-btn-text" (click)="dismissHero()">No es urgente para mí</button>
               </div>
@@ -117,7 +125,11 @@
                 <p class="rec-week-desc">{{ c.body }}</p>
                 <footer class="rec-week-foot">
                   @if (primaryAction(c.actions); as p) {
-                    <a [routerLink]="p.route" class="rec-btn rec-btn-outline acc">{{ p.label }} →</a>
+                    @if (p.route) {
+                      <a [routerLink]="p.route" class="rec-btn rec-btn-outline acc">{{ p.label }} →</a>
+                    } @else {
+                      <button type="button" class="rec-btn rec-btn-outline acc" title="Próximamente">{{ p.label }} →</button>
+                    }
                   }
                   @if (c.confidence; as conf) {
                     <span class="rec-week-conf">Confianza {{ conf }}</span>
@@ -173,7 +185,11 @@
                     @if (row.actions.length > 0) {
                       <div class="rec-ctx-body-actions">
                         @for (a of row.actions; track a.label) {
-                          <a [routerLink]="a.route" class="rec-btn rec-btn-outline acc">{{ a.label }}</a>
+                          @if (a.route) {
+                            <a [routerLink]="a.route" class="rec-btn rec-btn-outline acc">{{ a.label }}</a>
+                          } @else {
+                            <button type="button" class="rec-btn rec-btn-outline acc" title="Próximamente">{{ a.label }}</button>
+                          }
                         }
                       </div>
                     }
