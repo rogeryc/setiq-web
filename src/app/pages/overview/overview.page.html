@@ -109,7 +109,7 @@
 
       <div class="ov-memos">
         @if (data()?.memos; as memos) {
-          @for (m of memos; track m.tag) {
+          @for (m of memos.slice(0, 3); track m.tag) {
             <app-memo-card
               [severity]="m.severity"
               [tag]="m.tag"
@@ -128,6 +128,12 @@
           }
         }
       </div>
+
+      @if ((data()?.memos?.length ?? 0) > 3) {
+        <a routerLink="/recomendaciones" class="ov-memos-more">
+          Ver las {{ (data()?.memos?.length ?? 0) - 3 }} recomendaciones restantes →
+        </a>
+      }
     </section>
 
     <!-- Competitor activity -->

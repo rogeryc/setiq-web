@@ -1,115 +1,7 @@
-<main class="s-main">
-  <div class="s-wrap">
+<main class="s-main rec-page">
+  <div class="rec-wrap">
 
-    <!-- Hero -->
-    <section class="s-hero rec-hero">
-      <div class="s-hero-lead">
-        <div>
-          <span class="caps">Recomendaciones · Feed completo</span>
-          <h1>Lo que SETIQ te sugiere esta semana.</h1>
-        </div>
-        <p class="lede">
-          Cada recomendación viene de cruzar los mensajes y menciones que
-          procesamos con un modelo que prioriza por urgencia, oportunidad y
-          confianza. El resumen del lunes está al tope; las destacadas son
-          accionables; los memos son contexto que conviene tener cerca.
-        </p>
-      </div>
-      <div class="rec-stats">
-        @if (data(); as d) {
-          <article class="rec-stat">
-            <span class="caps muted">Total</span>
-            <div class="v num">{{ d.total }}</div>
-            <span class="sub">activas</span>
-          </article>
-          <article class="rec-stat">
-            <span class="caps muted">Destacadas</span>
-            <div class="v num">{{ d.counts.featured ?? 0 }}</div>
-            <span class="sub">para esta semana</span>
-          </article>
-          <article class="rec-stat">
-            <span class="caps muted">Memos</span>
-            <div class="v num">{{ d.counts.memo ?? 0 }}</div>
-            <span class="sub">de contexto</span>
-          </article>
-        }
-      </div>
-    </section>
-
-    <!-- Filter -->
-    @if (data()) {
-      <div class="rec-filterbar">
-        @for (opt of filterOptions(); track opt.key) {
-          <button type="button"
-                  class="rec-filterbtn"
-                  [class.active]="filter() === opt.key"
-                  [disabled]="opt.count === 0 && opt.key !== 'all'"
-                  (click)="setFilter(opt.key)">
-            {{ opt.label }}
-            <span class="rec-filterbtn-count">{{ opt.count }}</span>
-          </button>
-        }
-      </div>
-    }
-
-    <!-- Lead -->
-    @if (lead(); as l) {
-      <section class="rec-lead">
-        <span class="caps">{{ l.tag || 'Resumen ejecutivo · 30 días' }}</span>
-        <h2>
-          {{ l.title }}@if (l.title_em; as e) {<em>{{ ' ' + e }}</em>}
-        </h2>
-        <p class="lede">{{ l.body }}</p>
-      </section>
-    }
-
-    <!-- Featured cards -->
-    @if (featured().length > 0) {
-      <section class="rec-section">
-        <header class="s-secthead">
-          <h2>Destacadas</h2>
-          <span class="sub">Acciones recomendadas con alta confianza.</span>
-        </header>
-        <div class="rec-featured-grid">
-          @for (rec of featured(); track rec.id) {
-            <app-featured-rec-card
-              [title]="rec.title"
-              [titleEm]="rec.title_em"
-              [titleTail]="rec.title_tail"
-              [body]="rec.body"
-              [confidence]="rec.confidence"
-              [age]="rec.age"
-              [impact]="rec.impact"
-              [actions]="rec.actions" />
-          }
-        </div>
-      </section>
-    }
-
-    <!-- Memo grid -->
-    @if (memos().length > 0) {
-      <section class="rec-section">
-        <header class="s-secthead">
-          <h2>Memos</h2>
-          <span class="sub">Patrones y oportunidades que conviene tener cerca.</span>
-        </header>
-        <div class="rec-memo-grid">
-          @for (m of memos(); track m.id) {
-            <app-memo-card
-              [severity]="memoSeverity(m.severity)"
-              [tag]="m.tag || 'Memo'"
-              [confidence]="m.confidence"
-              [title]="m.title"
-              [titleEm]="m.title_em"
-              [body]="m.body"
-              [actions]="m.actions"
-              [footnote]="m.footnote" />
-          }
-        </div>
-      </section>
-    }
-
-    <!-- Empty / loading / error -->
+    <!-- Loading / error / empty short-circuits -->
     @if (!data() && !error()) {
       <app-empty-state state="loading" message="Cargando recomendaciones…" />
     }
@@ -118,10 +10,171 @@
         message="No pudimos cargar las recomendaciones."
         actionLabel="Reintentar" (action)="reload()" />
     }
-    @if (data() && lead() === null && featured().length === 0 && memos().length === 0) {
-      <app-empty-state state="empty"
-        message="No hay recomendaciones en esta vista."
-        hint="Probá otro filtro arriba, o esperá a que SETIQ genere nuevas memos basadas en la actividad reciente." />
+
+    @if (data(); as d) {
+
+      <!-- ===== Page intro ===== -->
+      <div class="rec-intro">
+        <div class="rec-intro-copy">
+          <span class="rec-kicker">RECOMENDACIONES · FEED COMPLETO</span>
+          <h1>Lo que SETIQ te sugiere esta semana.</h1>
+          <p class="rec-lede">
+            Cada recomendación viene de cruzar los mensajes y menciones que
+            procesamos con un modelo que prioriza por urgencia, oportunidad y
+            confianza. Arriba lo urgente, en el medio lo de esta semana, y al
+            final el contexto que conviene tener cerca.
+          </p>
+        </div>
+        <div class="rec-intro-meta">
+          {{ totalCount() }} recomendaciones activas
+        </div>
+      </div>
+
+      <!-- ===== 1 · ACTUÁ HOY ===== -->
+      <section class="rec-section">
+        <header class="rec-sechead">
+          <span class="rec-chip rec-chip-urgent">1 · ACTUÁ HOY</span>
+          <span class="rec-sechead-cap">Empezá por acá — es lo único urgente.</span>
+        </header>
+
+        @if (heroDismissed()) {
+          <div class="rec-hero-dismissed">
+            <span>Descartaste esta recomendación. No hay nada urgente pendiente.</span>
+            <button type="button" class="rec-btn rec-btn-outline" (click)="restoreHero()">Deshacer</button>
+          </div>
+        } @else if (hero(); as h) {
+          <article class="rec-hero">
+            <div class="rec-hero-body">
+              <div class="rec-hero-meta">
+                <span class="rec-hero-tag">● {{ h.tag || 'Recomendación destacada' }}</span>
+                @if (h.age; as a) { <span>·</span><span>{{ a }}</span> }
+              </div>
+              <h2 class="rec-hero-title">
+                {{ h.title }}@if (h.title_em; as em) {<span class="rec-em">{{ ' ' + em }}</span>}@if (h.title_tail; as tail) {<span>{{ ' ' + tail }}</span>}
+              </h2>
+              <p class="rec-hero-desc">{{ h.body }}</p>
+
+              <div class="rec-hero-actions">
+                @if (primaryAction(h.actions); as p) {
+                  <a [routerLink]="p.route" class="rec-btn rec-btn-primary">{{ p.label }}</a>
+                }
+                @if (secondaryAction(h.actions); as s) {
+                  <a [routerLink]="s.route" class="rec-btn rec-btn-outline">{{ s.label }}</a>
+                }
+                <button type="button" class="rec-btn-text" (click)="dismissHero()">No es urgente para mí</button>
+              </div>
+            </div>
+
+            <aside class="rec-hero-side">
+              @if (h.impact; as reason) {
+                <div class="rec-hero-fact">
+                  <span class="rec-hero-fact-lbl">POR QUÉ AHORA</span>
+                  <span class="rec-hero-fact-val">{{ reason }}</span>
+                </div>
+              }
+              @if (h.footnote; as gain) {
+                <div class="rec-hero-fact">
+                  <span class="rec-hero-fact-lbl">QUÉ GANÁS</span>
+                  <span class="rec-hero-fact-val">{{ gain }}</span>
+                </div>
+              }
+              @if (h.confidence; as conf) {
+                <div class="rec-hero-fact">
+                  <span class="rec-hero-fact-lbl">CONFIANZA DEL MODELO</span>
+                  <span class="rec-hero-fact-val">{{ conf }}</span>
+                </div>
+              }
+            </aside>
+          </article>
+        } @else {
+          <div class="rec-hero-dismissed">
+            <span>Todo bajo control — no hay nada urgente hoy.</span>
+          </div>
+        }
+      </section>
+
+      <!-- ===== 2 · ESTA SEMANA ===== -->
+      @if (weekCards().length > 0) {
+        <section class="rec-section">
+          <header class="rec-sechead">
+            <span class="rec-chip rec-chip-week">2 · ESTA SEMANA</span>
+            <span class="rec-sechead-cap">
+              @if (weekCards().length === 1) { Una oportunidad } @else { {{ weekCards().length }} oportunidades }
+              con fecha de vencimiento. No son para hoy, pero no esperan un mes.
+            </span>
+          </header>
+
+          <div class="rec-week-grid">
+            @for (c of weekCards(); track c.id) {
+              <article class="rec-week-card">
+                <div class="rec-week-meta">
+                  <span class="rec-week-tag">● {{ c.tag || 'Oportunidad' }}</span>
+                  @if (c.age; as a) { <span>·</span><span>{{ a }}</span> }
+                </div>
+                <h3 class="rec-week-title">
+                  {{ c.title }}@if (c.title_em; as em) {<span class="rec-em">{{ ' ' + em }}</span>}
+                </h3>
+                <p class="rec-week-desc">{{ c.body }}</p>
+                <footer class="rec-week-foot">
+                  @if (primaryAction(c.actions); as p) {
+                    <a [routerLink]="p.route" class="rec-btn rec-btn-outline">{{ p.label }} →</a>
+                  }
+                  @if (c.confidence; as conf) {
+                    <span class="rec-week-conf">Confianza {{ conf }}</span>
+                  }
+                </footer>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ===== 3 · CONTEXTO ===== -->
+      @if (allContext().length > 0) {
+        <section class="rec-section">
+          <header class="rec-sechead">
+            <span class="rec-chip rec-chip-context">3 · CONTEXTO</span>
+            <span class="rec-sechead-cap">
+              {{ allContext().length }} observaciones del motor. Nada acá pide acción — es lo que SETIQ vio mientras trabajabas.
+            </span>
+          </header>
+
+          <div class="rec-ctx-filters">
+            @for (opt of filterOptions(); track opt.key) {
+              <button type="button"
+                      class="rec-ctx-filter"
+                      [class.active]="filter() === opt.key"
+                      (click)="setFilter(opt.key)">{{ opt.label }}</button>
+            }
+          </div>
+
+          <div class="rec-ctx-list">
+            @for (row of visibleContext(); track row.id) {
+              <div class="rec-ctx-row" [attr.data-cat]="row.cat">
+                <span class="rec-ctx-tag">{{ row.tag }}</span>
+                <span class="rec-ctx-text">{{ row.text }}</span>
+                <span class="rec-ctx-when">{{ row.when }}</span>
+              </div>
+            }
+            @if (visibleContext().length === 0) {
+              <div class="rec-ctx-empty">Sin observaciones para este filtro.</div>
+            }
+            @if (hiddenCount() > 0 || expanded()) {
+              <button type="button" class="rec-ctx-toggle" (click)="toggleExpanded()">
+                @if (expanded()) { Mostrar menos }
+                @else { Ver las {{ hiddenCount() }} observaciones restantes }
+              </button>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ===== Footer: how this feed works ===== -->
+      <div class="rec-foot">
+        <span>Cada recomendación cruza tus menciones y mensajes, y se prioriza por urgencia × oportunidad × confianza.</span>
+        <span>El motor mira lo que definiste en <a routerLink="/segmentos">Segmentos</a> — si esa lista está vacía, SETIQ trabaja a ciegas.</span>
+      </div>
+
     }
 
   </div>
