@@ -3,7 +3,8 @@ import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angul
 import { RouterLink } from '@angular/router';
 
 import { InsightsService } from '../../core/api/insights.service';
-import { ApiInsight, ApiInsightAction, ApiInsightsResponse } from '../../core/api/types';
+import { TeamService } from '../../core/api/team.service';
+import { ApiInsight, ApiInsightAction, ApiInsightsResponse, ApiTeamMember } from '../../core/api/types';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state';
 
 type ContextCat = 'audiencia' | 'temas' | 'pares';
@@ -30,6 +31,7 @@ interface ContextRow {
 })
 export class RecomendacionesPage implements OnInit {
   private readonly service = inject(InsightsService);
+  private readonly teamService = inject(TeamService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   protected readonly data = signal<ApiInsightsResponse | null>(null);
@@ -39,6 +41,13 @@ export class RecomendacionesPage implements OnInit {
   protected readonly heroDismissed = signal(false);
   /** Per-row inline expand state — Set of memo ids the user has clicked open. */
   protected readonly expandedRows = signal<ReadonlySet<string>>(new Set());
+
+  // ---- Assignment modal ----
+  protected readonly assignFor = signal<ApiInsight | null>(null);
+  protected readonly teamMembers = signal<ApiTeamMember[]>([]);
+  protected readonly assignSubmitting = signal(false);
+  protected readonly assignError = signal<string | null>(null);
+  protected readonly assignSelected = signal<string | null>(null);
 
   /** The single most urgent recommendation — pinned to the top hero. */
   protected readonly hero = computed<ApiInsight | null>(() => {
@@ -179,5 +188,63 @@ export class RecomendacionesPage implements OnInit {
 
   secondaryAction(a: ApiInsightAction[]): ApiInsightAction | null {
     return a[1] ?? null;
+  }
+
+  /** Detect the placeholder "Asignar a X" action so the button can trigger the
+   * modal instead of a dead click. Label-based rather than route-based because
+   * the seed data ships it with no route. */
+  isAssignAction(a: ApiInsightAction | null | undefined): boolean {
+    return !!a && !a.route && /^asignar\b/i.test(a.label);
+  }
+
+  // ---- Assignment modal actions ----
+
+  async openAssignFor(insight: ApiInsight): Promise<void> {
+    this.assignFor.set(insight);
+    this.assignError.set(null);
+    this.assignSelected.set(insight.assigned_user_id ?? null);
+    if (this.teamMembers().length === 0) {
+      try {
+        const t = await this.teamService.list();
+        this.teamMembers.set(t.members);
+      } catch (e) {
+        this.assignError.set(e instanceof Error ? e.message : String(e));
+      }
+    }
+  }
+
+  closeAssign(): void {
+    if (this.assignSubmitting()) return;
+    this.assignFor.set(null);
+    this.assignError.set(null);
+    this.assignSelected.set(null);
+  }
+
+  pickAssignee(userId: string | null): void {
+    this.assignSelected.set(userId);
+  }
+
+  async submitAssignment(): Promise<void> {
+    const target = this.assignFor();
+    if (!target) return;
+    this.assignSubmitting.set(true);
+    this.assignError.set(null);
+    try {
+      const res = await this.service.assign(target.id, this.assignSelected());
+      // Patch the local insight list so the change reflects immediately without
+      // re-fetching. Any card that renders `assigned_user_name` picks it up.
+      this.data.update((d) => d && ({
+        ...d,
+        insights: d.insights.map((i) => i.id === target.id
+          ? { ...i, assigned_user_id: res.assigned_user_id, assigned_user_name: res.assigned_user_name }
+          : i),
+      }));
+      this.assignFor.set(null);
+    } catch (e) {
+      const err = e as { error?: { detail?: string }; message?: string };
+      this.assignError.set(err.error?.detail ?? err.message ?? 'No pudimos asignar.');
+    } finally {
+      this.assignSubmitting.set(false);
+    }
   }
 }

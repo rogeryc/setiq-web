@@ -244,12 +244,20 @@ export interface ApiInsight {
   actions: ApiInsightAction[];
   rank: number;
   created_at: string;
+  assigned_user_id?: string | null;
+  assigned_user_name?: string | null;
 }
 
 export interface ApiInsightsResponse {
   insights: ApiInsight[];
   total: number;
   counts: Partial<Record<InsightKind, number>>;
+}
+
+export interface ApiInsightMutation {
+  id: string;
+  assigned_user_id: string | null;
+  assigned_user_name: string | null;
 }
 
 export type TeamRole = 'admin' | 'agent' | 'viewer';

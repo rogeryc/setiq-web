@@ -65,11 +65,16 @@
                 @if (secondaryAction(h.actions); as s) {
                   @if (s.route) {
                     <a [routerLink]="s.route" class="rec-btn rec-btn-outline">{{ s.label }}</a>
+                  } @else if (isAssignAction(s)) {
+                    <button type="button" class="rec-btn rec-btn-outline" (click)="openAssignFor(h)">{{ s.label }}</button>
                   } @else {
                     <button type="button" class="rec-btn rec-btn-outline" title="Próximamente">{{ s.label }}</button>
                   }
                 }
                 <button type="button" class="rec-btn-text" (click)="dismissHero()">No es urgente para mí</button>
+                @if (h.assigned_user_name; as name) {
+                  <span class="rec-assigned">✓ Asignado a {{ name }}</span>
+                }
               </div>
             </div>
 
@@ -219,4 +224,58 @@
     }
 
   </div>
+
+  @if (assignFor(); as target) {
+    <div class="modal-backdrop" (click)="closeAssign()">
+      <div class="modal-card rec-assign-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <header class="modal-head">
+          <h3>Asignar recomendación</h3>
+          <button type="button" class="modal-close" (click)="closeAssign()" aria-label="Cerrar">×</button>
+        </header>
+        <div class="modal-body">
+          <p class="rec-assign-target">{{ target.title }}</p>
+          <div class="rec-assign-list">
+            @for (m of teamMembers(); track m.id) {
+              <button type="button"
+                      class="rec-assign-pick"
+                      [class.active]="assignSelected() === m.id"
+                      [disabled]="assignSubmitting()"
+                      (click)="pickAssignee(m.id)">
+                <span class="rec-assign-avatar">{{ m.initials }}</span>
+                <span class="rec-assign-who">
+                  <strong>{{ m.name }}</strong>
+                  <span>{{ m.email }} · {{ m.role }}</span>
+                </span>
+                @if (assignSelected() === m.id) {
+                  <span class="rec-assign-check">✓</span>
+                }
+              </button>
+            }
+            @if (teamMembers().length === 0 && !assignError()) {
+              <p class="rec-assign-empty">Cargando equipo…</p>
+            }
+          </div>
+          @if (target.assigned_user_id) {
+            <button type="button"
+                    class="rec-assign-clear"
+                    [class.active]="assignSelected() === null"
+                    [disabled]="assignSubmitting()"
+                    (click)="pickAssignee(null)">
+              Dejar sin asignar
+            </button>
+          }
+          @if (assignError(); as err) {
+            <div class="modal-error">{{ err }}</div>
+          }
+        </div>
+        <footer class="modal-foot">
+          <button type="button" class="s-btn ghost" (click)="closeAssign()" [disabled]="assignSubmitting()">Cancelar</button>
+          <button type="button" class="s-btn acc" (click)="submitAssignment()"
+                  [disabled]="assignSubmitting() || assignSelected() === (target.assigned_user_id ?? null)">
+            {{ assignSubmitting() ? 'Asignando…' : 'Asignar' }}
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
 </main>

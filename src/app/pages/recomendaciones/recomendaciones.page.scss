@@ -507,6 +507,113 @@
   a:hover { color: var(--rx-acc-hover); text-decoration: underline; }
 }
 
+// ---- Assigned indicator + modal ------------------------------------------
+
+.rec-assigned {
+  font-size: 12.5px;
+  color: var(--rx-pos);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.rec-assign-modal {
+  max-width: 480px;
+  width: 100%;
+}
+
+.rec-assign-target {
+  margin: 0 0 14px;
+  font-size: 13.5px;
+  color: var(--rx-body);
+  line-height: 1.5;
+  padding: 10px 14px;
+  background: var(--rx-list);
+  border: 1px solid var(--rx-b-12);
+  border-radius: 8px;
+}
+
+.rec-assign-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.rec-assign-pick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--rx-card);
+  border: 1px solid var(--rx-b-12);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: background 100ms, border-color 100ms;
+
+  &:hover:not(:disabled) { background: var(--rx-list-hover); border-color: var(--rx-b-20); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  &.active {
+    border-color: var(--rx-acc);
+    background: rgba(91,155,255,.08);
+  }
+}
+
+.rec-assign-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--rx-chip-mute);
+  color: var(--rx-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rec-assign-who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+
+  strong { font-size: 13.5px; color: var(--rx-strong); font-weight: 600; }
+  span { font-size: 12px; color: var(--rx-mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+.rec-assign-check { color: var(--rx-acc-2); font-weight: 700; }
+
+.rec-assign-clear {
+  margin-top: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  background: none;
+  border: 1px dashed var(--rx-b-20);
+  border-radius: 8px;
+  color: var(--rx-faint);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { color: var(--rx-body); border-color: var(--rx-b-25); }
+  &.active { border-color: var(--rx-acc); color: var(--rx-acc-2); background: rgba(91,155,255,.08); }
+}
+
+.rec-assign-empty {
+  margin: 8px 0 0;
+  padding: 18px 12px;
+  color: var(--rx-mute);
+  font-size: 13px;
+  text-align: center;
+}
+
 // ---- Responsive: single-column below 900px --------------------------------
 
 @media (max-width: 900px) {

@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from './auth.service';
-import { ApiInsightsResponse, InsightKind } from './types';
+import { ApiInsightMutation, ApiInsightsResponse, InsightKind } from './types';
 
 const API_BASE = '';
 
@@ -19,6 +19,15 @@ export class InsightsService {
     const params = new HttpParams().set('kind', kind);
     return firstValueFrom(
       this.http.get<ApiInsightsResponse>(`${API_BASE}/insights`, { params }),
+    );
+  }
+
+  /** Assign or unassign an insight. Pass null to clear. */
+  async assign(id: string, userId: string | null): Promise<ApiInsightMutation> {
+    return firstValueFrom(
+      this.http.patch<ApiInsightMutation>(`${API_BASE}/insights/${id}`, {
+        assigned_user_id: userId,
+      }),
     );
   }
 }
