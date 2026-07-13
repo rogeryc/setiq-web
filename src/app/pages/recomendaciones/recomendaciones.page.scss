@@ -153,6 +153,16 @@
       text-decoration: none;
     }
   }
+
+  // Accent-tinted outline — used on hero-dismissed, week cards, and expanded
+  // context rows. Shared here to avoid re-declaring the same colors 3 times.
+  &.rec-btn-outline.acc {
+    border-color: rgba(91,155,255,.5);
+    color: var(--rx-acc-2);
+    font-weight: 600;
+
+    &:hover { background: rgba(91,155,255,.12); border-color: rgba(91,155,255,.5); }
+  }
 }
 
 .rec-btn-text {
@@ -257,15 +267,7 @@
   font-size: 14px;
   color: var(--rx-mute);
 
-  .rec-btn-outline {
-    padding: 7px 14px;
-    font-size: 13px;
-    border-color: rgba(91,155,255,.5);
-    color: var(--rx-acc-2);
-    font-weight: 600;
-
-    &:hover { border-color: var(--rx-acc-2); background: rgba(91,155,255,.10); }
-  }
+  .rec-btn-outline { padding: 7px 14px; font-size: 13px; }
 }
 
 // ---- Week cards (ESTA SEMANA) --------------------------------------------
@@ -325,21 +327,8 @@
   gap: 14px;
   margin-top: 18px;
 
-  .rec-btn-outline {
-    border-color: rgba(91,155,255,.5);
-    color: var(--rx-acc-2);
-    font-weight: 600;
-    font-size: 13.5px;
-    padding: 9px 16px;
-    border-radius: 9px;
-
-    &:hover { background: rgba(91,155,255,.12); border-color: rgba(91,155,255,.5); }
-  }
-
-  .rec-week-conf {
-    font-size: 12.5px;
-    color: var(--rx-faint);
-  }
+  .rec-btn-outline { font-size: 13.5px; padding: 9px 16px; border-radius: 9px; }
+  .rec-week-conf { font-size: 12.5px; color: var(--rx-faint); }
 }
 
 // ---- Context (CONTEXTO) --------------------------------------------------
@@ -378,17 +367,31 @@
   overflow: hidden;
 }
 
+// Each row is a container that swaps between compact (head only) and
+// expanded (head + inline body) — click on head toggles.
 .rec-ctx-row {
+  border-bottom: 1px solid var(--rx-b-08);
+  background: var(--rx-list);
+
+  &:last-of-type { border-bottom: none; }
+  &.expanded { background: var(--rx-list-hover); }
+}
+
+.rec-ctx-row-head {
   display: flex;
   align-items: baseline;
   gap: 16px;
+  width: 100%;
   padding: 15px 22px;
-  border-bottom: 1px solid var(--rx-b-08);
-  background: var(--rx-list);
+  background: none;
+  border: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
   transition: background 100ms;
 
   &:hover { background: var(--rx-list-hover); }
-  &:last-of-type { border-bottom: none; }
 }
 
 .rec-ctx-tag {
@@ -413,6 +416,54 @@
   font-size: 12px;
   color: var(--rx-faintest);
   white-space: nowrap;
+}
+
+.rec-ctx-caret {
+  font-size: 11px;
+  color: var(--rx-faint);
+  transition: transform 150ms;
+  width: 12px;
+  text-align: center;
+
+  .rec-ctx-row.expanded & { transform: rotate(180deg); color: var(--rx-acc-2); }
+}
+
+// Expanded body — restores the memo's body/confidence/footnote/actions that
+// the compact row can't show. Indented under the tag column to line up with
+// the row content.
+.rec-ctx-body {
+  padding: 0 22px 18px calc(88px + 22px + 16px);
+}
+
+.rec-ctx-body-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--rx-body);
+}
+
+.rec-ctx-body-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--rx-faint);
+}
+
+.rec-ctx-body-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+
+  .rec-btn-outline { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
+}
+
+// On narrow viewports the tag column is smaller — pull the body flush with
+// the row's left padding instead of trying to line up under the tag.
+@media (max-width: 900px) {
+  .rec-ctx-body { padding: 0 22px 18px 22px; }
 }
 
 .rec-ctx-empty {

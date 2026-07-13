@@ -15,6 +15,11 @@ interface ContextRow {
   tag: string;
   text: string;
   when: string;
+  // Everything below is progressive-disclosure — only shown when the row is expanded.
+  body: string;
+  confidence?: string;
+  footnote?: string;
+  actions: ApiInsightAction[];
 }
 
 @Component({
@@ -32,6 +37,8 @@ export class RecomendacionesPage implements OnInit {
   protected readonly filter = signal<Filter>('todas');
   protected readonly expanded = signal(false);
   protected readonly heroDismissed = signal(false);
+  /** Per-row inline expand state — Set of memo ids the user has clicked open. */
+  protected readonly expandedRows = signal<ReadonlySet<string>>(new Set());
 
   /** The single most urgent recommendation — pinned to the top hero. */
   protected readonly hero = computed<ApiInsight | null>(() => {
@@ -101,6 +108,19 @@ export class RecomendacionesPage implements OnInit {
     this.expanded.update((v) => !v);
   }
 
+  toggleRow(id: string): void {
+    this.expandedRows.update((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  isRowExpanded(id: string): boolean {
+    return this.expandedRows().has(id);
+  }
+
   dismissHero(): void {
     this.heroDismissed.set(true);
   }
@@ -118,6 +138,10 @@ export class RecomendacionesPage implements OnInit {
       tag: this.tagLabel(cat),
       text: m.title,
       when: m.age || this.relativeCreated(m.created_at),
+      body: m.body,
+      confidence: m.confidence,
+      footnote: m.footnote,
+      actions: m.actions,
     };
   }
 

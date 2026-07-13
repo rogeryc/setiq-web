@@ -40,7 +40,7 @@
         @if (heroDismissed()) {
           <div class="rec-hero-dismissed">
             <span>Descartaste esta recomendación. No hay nada urgente pendiente.</span>
-            <button type="button" class="rec-btn rec-btn-outline" (click)="restoreHero()">Deshacer</button>
+            <button type="button" class="rec-btn rec-btn-outline acc" (click)="restoreHero()">Deshacer</button>
           </div>
         } @else if (hero(); as h) {
           <article class="rec-hero">
@@ -117,7 +117,7 @@
                 <p class="rec-week-desc">{{ c.body }}</p>
                 <footer class="rec-week-foot">
                   @if (primaryAction(c.actions); as p) {
-                    <a [routerLink]="p.route" class="rec-btn rec-btn-outline">{{ p.label }} →</a>
+                    <a [routerLink]="p.route" class="rec-btn rec-btn-outline acc">{{ p.label }} →</a>
                   }
                   @if (c.confidence; as conf) {
                     <span class="rec-week-conf">Confianza {{ conf }}</span>
@@ -150,10 +150,35 @@
 
           <div class="rec-ctx-list">
             @for (row of visibleContext(); track row.id) {
-              <div class="rec-ctx-row" [attr.data-cat]="row.cat">
-                <span class="rec-ctx-tag">{{ row.tag }}</span>
-                <span class="rec-ctx-text">{{ row.text }}</span>
-                <span class="rec-ctx-when">{{ row.when }}</span>
+              <div class="rec-ctx-row"
+                   [class.expanded]="isRowExpanded(row.id)"
+                   [attr.data-cat]="row.cat">
+                <button type="button" class="rec-ctx-row-head"
+                        [attr.aria-expanded]="isRowExpanded(row.id)"
+                        (click)="toggleRow(row.id)">
+                  <span class="rec-ctx-tag">{{ row.tag }}</span>
+                  <span class="rec-ctx-text">{{ row.text }}</span>
+                  <span class="rec-ctx-when">{{ row.when }}</span>
+                  <span class="rec-ctx-caret" aria-hidden="true">▾</span>
+                </button>
+                @if (isRowExpanded(row.id)) {
+                  <div class="rec-ctx-body">
+                    @if (row.body) { <p class="rec-ctx-body-text">{{ row.body }}</p> }
+                    @if (row.confidence || row.footnote) {
+                      <div class="rec-ctx-body-meta">
+                        @if (row.confidence; as c) { <span>{{ c }}</span> }
+                        @if (row.footnote; as f) { <span>{{ f }}</span> }
+                      </div>
+                    }
+                    @if (row.actions.length > 0) {
+                      <div class="rec-ctx-body-actions">
+                        @for (a of row.actions; track a.label) {
+                          <a [routerLink]="a.route" class="rec-btn rec-btn-outline acc">{{ a.label }}</a>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
               </div>
             }
             @if (visibleContext().length === 0) {
