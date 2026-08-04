@@ -181,14 +181,16 @@
 
 .rec-hero {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1fr; // collapsed: single column, no side panel
   border: 1px solid rgba(241,122,138,.35);
   background: linear-gradient(180deg, rgba(241,122,138,.07), rgba(241,122,138,.02));
   border-radius: 16px;
   overflow: hidden;
+
+  &.expanded { grid-template-columns: 1.6fr 1fr; }
 }
 
-.rec-hero-body { padding: 28px 32px; }
+.rec-hero-body { padding: 24px 28px; }
 
 .rec-hero-meta {
   display: flex;
@@ -213,11 +215,27 @@
 }
 
 .rec-hero-desc {
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   font-size: 15px;
   line-height: 1.6;
   color: var(--rx-body);
 }
+
+// Small inline confidence chip shown in the meta row — replaces the side-panel
+// "CONFIANZA DEL MODELO" fact when the hero is collapsed.
+.rec-conf-pill {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rx-b-20);
+  color: var(--rx-strong);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.rec-btn-text.muted { color: var(--rx-faintest); }
 
 .rec-hero-actions {
   display: flex;
@@ -282,9 +300,27 @@
   border: 1px solid var(--rx-b-14);
   background: var(--rx-card);
   border-radius: 16px;
-  padding: 24px 26px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
+  transition: border-color 120ms, background 120ms;
+
+  &:hover { border-color: var(--rx-b-20); }
+  &.expanded { background: rgba(255,255,255,.015); border-color: var(--rx-b-20); }
+}
+
+// Click target that toggles the card open/closed. Reset button styles so it
+// looks like the header of the card, not a button.
+.rec-week-head {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
 }
 
 .rec-week-meta {
@@ -294,9 +330,18 @@
   flex-wrap: wrap;
   font-size: 12px;
   color: var(--rx-mute);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 
   .rec-week-tag { color: var(--rx-pos); font-weight: 700; }
+}
+
+.rec-week-caret {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--rx-faint);
+  transition: transform 150ms, color 120ms;
+
+  .rec-week-card.expanded & { transform: rotate(180deg); color: var(--rx-acc-2); }
 }
 
 // Alternate the peer/warning color on the second card so the two cards read
@@ -315,20 +360,26 @@
 
 .rec-week-desc {
   margin: 12px 0 0;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 13.5px;
+  line-height: 1.55;
   color: var(--rx-body);
-  flex: 1;
 }
 
 .rec-week-foot {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-top: 18px;
+  margin-top: 14px;
 
   .rec-btn-outline { font-size: 13.5px; padding: 9px 16px; border-radius: 9px; }
-  .rec-week-conf { font-size: 12.5px; color: var(--rx-faint); }
+  .rec-week-conf {
+    font-size: 11.5px;
+    color: var(--rx-strong);
+    font-weight: 600;
+    padding: 3px 10px;
+    border: 1px solid var(--rx-b-20);
+    border-radius: 999px;
+  }
 }
 
 // ---- Context (CONTEXTO) --------------------------------------------------

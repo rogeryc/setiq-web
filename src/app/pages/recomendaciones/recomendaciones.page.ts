@@ -39,7 +39,11 @@ export class RecomendacionesPage implements OnInit {
   protected readonly filter = signal<Filter>('todas');
   protected readonly expanded = signal(false);
   protected readonly heroDismissed = signal(false);
-  /** Per-row inline expand state — Set of memo ids the user has clicked open. */
+  protected readonly heroDetailOpen = signal(false);
+  /** Per-card inline expand state — hero + week + context all use the same
+   * Set keyed by insight id. */
+  protected readonly expandedCards = signal<ReadonlySet<string>>(new Set());
+  /** Per-context-row expand state (kept separate from cards for clarity). */
   protected readonly expandedRows = signal<ReadonlySet<string>>(new Set());
 
   // ---- Assignment modal ----
@@ -128,6 +132,23 @@ export class RecomendacionesPage implements OnInit {
 
   isRowExpanded(id: string): boolean {
     return this.expandedRows().has(id);
+  }
+
+  toggleCard(id: string): void {
+    this.expandedCards.update((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  isCardExpanded(id: string): boolean {
+    return this.expandedCards().has(id);
+  }
+
+  toggleHeroDetail(): void {
+    this.heroDetailOpen.update((v) => !v);
   }
 
   dismissHero(): void {

@@ -16,14 +16,9 @@
       <!-- ===== Page intro ===== -->
       <div class="rec-intro">
         <div class="rec-intro-copy">
-          <span class="rec-kicker">RECOMENDACIONES · FEED COMPLETO</span>
+          <span class="rec-kicker">RECOMENDACIONES</span>
           <h1>Lo que SETIQ te sugiere esta semana.</h1>
-          <p class="rec-lede">
-            Cada recomendación viene de cruzar los mensajes y menciones que
-            procesamos con un modelo que prioriza por urgencia, oportunidad y
-            confianza. Arriba lo urgente, en el medio lo de esta semana, y al
-            final el contexto que conviene tener cerca.
-          </p>
+          <p class="rec-lede">Priorizadas por urgencia × oportunidad × confianza.</p>
         </div>
         <div class="rec-intro-meta">
           {{ totalCount() }} recomendaciones activas
@@ -43,16 +38,18 @@
             <button type="button" class="rec-btn rec-btn-outline acc" (click)="restoreHero()">Deshacer</button>
           </div>
         } @else if (hero(); as h) {
-          <article class="rec-hero">
+          <article class="rec-hero" [class.expanded]="heroDetailOpen()">
             <div class="rec-hero-body">
               <div class="rec-hero-meta">
                 <span class="rec-hero-tag">● {{ h.tag || 'Recomendación destacada' }}</span>
                 @if (h.age; as a) { <span>·</span><span>{{ a }}</span> }
+                @if (h.confidence; as conf) {
+                  <span class="rec-conf-pill">{{ conf }} confianza</span>
+                }
               </div>
               <h2 class="rec-hero-title">
                 {{ h.title }}@if (h.title_em; as em) {<span class="rec-em">{{ ' ' + em }}</span>}@if (h.title_tail; as tail) {<span>{{ ' ' + tail }}</span>}
               </h2>
-              <p class="rec-hero-desc">{{ h.body }}</p>
 
               <div class="rec-hero-actions">
                 @if (primaryAction(h.actions); as p) {
@@ -73,13 +70,22 @@
                     <button type="button" class="rec-btn rec-btn-outline" title="Próximamente">{{ s.label }}</button>
                   }
                 }
-                <button type="button" class="rec-btn-text" (click)="dismissHero()">No es urgente para mí</button>
+                <button type="button" class="rec-btn-text" (click)="toggleHeroDetail()"
+                        [attr.aria-expanded]="heroDetailOpen()">
+                  {{ heroDetailOpen() ? 'Ocultar detalle ▴' : 'Ver detalle ▾' }}
+                </button>
+                <button type="button" class="rec-btn-text muted" (click)="dismissHero()">No es urgente para mí</button>
                 @if (h.assigned_user_name; as name) {
                   <span class="rec-assigned">✓ Asignado a {{ name }}</span>
                 }
               </div>
+
+              @if (heroDetailOpen() && h.body) {
+                <p class="rec-hero-desc">{{ h.body }}</p>
+              }
             </div>
 
+            @if (heroDetailOpen()) {
             <aside class="rec-hero-side">
               @if (h.impact; as reason) {
                 <div class="rec-hero-fact">
@@ -100,6 +106,7 @@
                 </div>
               }
             </aside>
+            }
           </article>
         } @else {
           <div class="rec-hero-dismissed">
@@ -121,15 +128,22 @@
 
           <div class="rec-week-grid">
             @for (c of weekCards(); track c.id) {
-              <article class="rec-week-card">
-                <div class="rec-week-meta">
-                  <span class="rec-week-tag">● {{ c.tag || 'Oportunidad' }}</span>
-                  @if (c.age; as a) { <span>·</span><span>{{ a }}</span> }
-                </div>
-                <h3 class="rec-week-title">
-                  {{ c.title }}@if (c.title_em; as em) {<span class="rec-em">{{ ' ' + em }}</span>}
-                </h3>
-                <p class="rec-week-desc">{{ c.body }}</p>
+              <article class="rec-week-card" [class.expanded]="isCardExpanded(c.id)">
+                <button type="button" class="rec-week-head"
+                        [attr.aria-expanded]="isCardExpanded(c.id)"
+                        (click)="toggleCard(c.id)">
+                  <div class="rec-week-meta">
+                    <span class="rec-week-tag">● {{ c.tag || 'Oportunidad' }}</span>
+                    @if (c.age; as a) { <span>·</span><span>{{ a }}</span> }
+                    <span class="rec-week-caret" aria-hidden="true">▾</span>
+                  </div>
+                  <h3 class="rec-week-title">
+                    {{ c.title }}@if (c.title_em; as em) {<span class="rec-em">{{ ' ' + em }}</span>}
+                  </h3>
+                </button>
+                @if (isCardExpanded(c.id) && c.body) {
+                  <p class="rec-week-desc">{{ c.body }}</p>
+                }
                 <footer class="rec-week-foot">
                   @if (primaryAction(c.actions); as p) {
                     @if (p.route) {
@@ -139,7 +153,7 @@
                     }
                   }
                   @if (c.confidence; as conf) {
-                    <span class="rec-week-conf">Confianza {{ conf }}</span>
+                    <span class="rec-week-conf">{{ conf }} confianza</span>
                   }
                 </footer>
               </article>
