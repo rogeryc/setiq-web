@@ -68,6 +68,7 @@
               @for (c of group.conversations; track c.id) {
                 <a class="s-conv"
                    [class.active]="selectedId() === c.id"
+                   [class.resolved]="c.status === 'resolved'"
                    (click)="selectConversation(c.id)"
                    role="button"
                    tabindex="0">
@@ -99,6 +100,9 @@
                     </div>
                     <div class="sn">{{ c.last_message_preview }}</div>
                     <div class="tags">
+                      @if (c.status === 'resolved') {
+                        <span class="tag resolved">Resuelto</span>
+                      }
                       @if (c.sentiment) {
                         <span class="tag" [class.pos]="sentimentTone(c.sentiment) === 'pos'"
                                           [class.neg]="sentimentTone(c.sentiment) === 'neg'">
