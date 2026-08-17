@@ -1,152 +1,279 @@
-<main class="s-main">
-  <div class="s-wrap">
+<main class="s-main seg-page">
+  <div class="seg-wrap">
 
-    <section class="s-hero seg-hero">
-      <div class="s-hero-lead">
-        <div>
-          <span class="caps">Segmentos · Monitoreo</span>
-          <h1>Qué está mirando SETIQ por vos.</h1>
+    <!-- Loading / error short-circuits -->
+    @if (!data() && !error()) {
+      <app-empty-state state="loading" message="Cargando segmentos…" />
+    }
+    @if (error(); as e) {
+      <app-empty-state state="error" [errorText]="e"
+        message="No pudimos cargar los segmentos."
+        actionLabel="Reintentar" (action)="reload()" />
+    }
+
+    @if (data(); as d) {
+
+      <!-- ===== Page intro ===== -->
+      <div class="seg-intro">
+        <div class="seg-intro-copy">
+          <span class="seg-kicker">SEGMENTOS</span>
+          <h1>Lo que SETIQ está rastreando por vos.</h1>
+          <p class="seg-lede">Priorizados: tu marca &rsaquo; tus competidores &rsaquo; señales del contexto.</p>
         </div>
-        <p class="lede">
-          Cada segmento es algo que SETIQ rastrea en tiempo real — tu marca, tus
-          competidores, temas y hashtags. Apify recoge menciones públicas; Meta
-          Graph trae las de tus propios canales conectados.
-        </p>
-      </div>
-      <div class="seg-stats">
-        @if (data(); as d) {
-          <article class="seg-stat">
-            <span class="caps muted">Sujetos activos</span>
-            <div class="v num">{{ enabledCount() }}</div>
-            <span class="sub">de {{ d.length }} configurados</span>
-          </article>
-          <article class="seg-stat">
-            <span class="caps muted">Menciones acumuladas</span>
-            <div class="v num">{{ totalMentions() }}</div>
-            <span class="sub">en los últimos 30 días</span>
-          </article>
-        }
-      </div>
-    </section>
-
-    <section class="s-section">
-      <header class="s-secthead">
-        <h2>Sujetos rastreados</h2>
-        <span class="sub">Editá la lista cuando quieras — los cambios se propagan al próximo ciclo de scraping.</span>
-        <span class="right">
-          <button type="button" class="s-btn acc" (click)="openModal()">+ Agregar sujeto</button>
-        </span>
-      </header>
-
-      <div class="seg-filterbar">
-        @for (opt of filterOptions(); track opt.key) {
-          <button type="button"
-                  class="seg-filterbtn"
-                  [class.active]="filter() === opt.key"
-                  [disabled]="opt.count === 0 && opt.key !== 'all'"
-                  (click)="setFilter(opt.key)">
-            {{ opt.label }}
-            <span class="seg-filterbtn-count">{{ opt.count }}</span>
-          </button>
-        }
-      </div>
-
-      @if (sections().length > 0) {
-        @for (sec of sections(); track sec.kind) {
-          <div class="seg-section">
-            <header class="seg-section-head">
-              <h3>{{ sec.label }} <span class="num">{{ sec.subjects.length }}</span></h3>
-              <span class="sub">{{ sec.description }}</span>
-            </header>
-            <div class="seg-grid">
-              @for (s of sec.subjects; track s.id) {
-                <article class="seg-card" [class.dim]="!s.enabled" [attr.data-kind]="s.kind">
-                  <header class="seg-card-head">
-                    <span class="seg-kind">{{ sec.label }}</span>
-                    <span class="seg-state" [class.on]="s.enabled">
-                      {{ s.enabled ? 'Activo' : 'Pausado' }}
-                    </span>
-                  </header>
-                  <h4 class="seg-card-title">
-                    <button type="button" class="seg-title-btn" (click)="openDetail(s)">{{ s.label }}</button>
-                  </h4>
-
-                  @if (handleEntries(s.handles).length > 0) {
-                    <div class="seg-chips">
-                      @for (h of handleEntries(s.handles); track h[0]) {
-                        <span class="seg-chip handle"
-                              [attr.data-platform]="h[0]"
-                              [title]="h[0]">{{ h[1] }}</span>
-                      }
-                    </div>
-                  }
-
-                  @if (s.keywords.length > 0) {
-                    <div class="seg-chips">
-                      @for (k of s.keywords; track k) {
-                        <span class="seg-chip kw">{{ k }}</span>
-                      }
-                    </div>
-                  }
-
-                  @if (s.hashtags.length > 0) {
-                    <div class="seg-chips">
-                      @for (tag of s.hashtags; track tag) {
-                        <span class="seg-chip hash">#{{ tag }}</span>
-                      }
-                    </div>
-                  }
-
-                  <footer class="seg-card-foot">
-                    <span class="num">{{ s.mention_count }} menciones</span>
-                    <span class="sub">·</span>
-                    <span class="sub">{{ formatLastMention(s.last_mention_at) }}</span>
-                  </footer>
-
-                  <div class="seg-card-actions">
-                    <button type="button" class="seg-act" (click)="openEdit(s)"
-                            [disabled]="busyId() === s.id">Editar</button>
-                    <button type="button" class="seg-act" (click)="togglePause(s)"
-                            [disabled]="busyId() === s.id">
-                      {{ s.enabled ? 'Pausar' : 'Reactivar' }}
-                    </button>
-                    <button type="button" class="seg-act danger" (click)="deleteSubject(s)"
-                            [disabled]="busyId() === s.id">Eliminar</button>
-                  </div>
-                </article>
-              }
-            </div>
+        <div class="seg-intro-side">
+          <div class="seg-intro-meta">
+            <strong>{{ enabledCount() }}</strong> activos ·
+            <strong>{{ totalMentions() }}</strong> menciones (30d)
           </div>
-        }
-      } @else if (error()) {
-        <app-empty-state state="error" [errorText]="error()!"
-          message="No pudimos cargar los segmentos."
-          actionLabel="Reintentar" (action)="reload()" />
-      } @else if (data() && sections().length === 0) {
-        <app-empty-state state="empty"
-          message="No hay sujetos con esos filtros."
-          hint="Probá la pestaña 'Todos' arriba, o agregá un nuevo sujeto." />
-      } @else {
-        <app-empty-state state="loading" message="Cargando segmentos…" />
+          <button type="button" class="seg-btn seg-btn-primary" (click)="openModal()">+ Agregar sujeto</button>
+        </div>
+      </div>
+
+      <!-- ===== Onboarding empty state ===== -->
+      @if (d.length === 0) {
+        <div class="seg-onboard">
+          <h2>Empezá agregando tu marca.</h2>
+          <p>Un sujeto = algo que SETIQ escucha. Sumá tu marca primero, después competidores, después temas que te importan.</p>
+          <div class="seg-onboard-actions">
+            <button type="button" class="seg-btn seg-btn-primary" (click)="openModal('brand')">Agregar mi marca</button>
+            <button type="button" class="seg-btn seg-btn-outline" (click)="openModal('competitor')">Agregar competidor</button>
+          </div>
+        </div>
       }
-    </section>
+
+      <!-- ===== Filter bar ===== -->
+      @if (d.length > 0) {
+        <div class="seg-filterbar">
+          @for (opt of filterOptions(); track opt.key) {
+            <button type="button"
+                    class="seg-filterbtn"
+                    [class.active]="filter() === opt.key"
+                    [disabled]="opt.count === 0 && opt.key !== 'all'"
+                    (click)="setFilter(opt.key)">
+              {{ opt.label }}
+              <span class="seg-filterbtn-count">{{ opt.count }}</span>
+            </button>
+          }
+        </div>
+      }
+
+      <!-- ===== 1 · TU MARCA (hero — always expanded) ===== -->
+      @if (tierBrand().length > 0) {
+        <section class="seg-section">
+          <header class="seg-sechead">
+            <span class="seg-chip seg-chip-brand">1 · TU MARCA</span>
+            <span class="seg-sechead-cap">Lo que SETIQ escucha por vos — el pulso de tu propia voz.</span>
+          </header>
+
+          @for (s of tierBrand(); track s.id) {
+            <article class="seg-hero-card" [class.dim]="!s.enabled" [attr.data-kind]="s.kind">
+              <div class="seg-hero-body">
+                <div class="seg-hero-meta">
+                  <span class="seg-hero-state" [class.on]="s.enabled">{{ s.enabled ? 'Activo' : 'Pausado' }}</span>
+                  <span>·</span>
+                  <span>{{ s.mention_count }} menciones</span>
+                  <span>·</span>
+                  <span>{{ formatLastMention(s.last_mention_at) }}</span>
+                </div>
+                <h2 class="seg-hero-title">{{ s.label }}</h2>
+
+                @if (handleEntries(s.handles).length > 0) {
+                  <div class="seg-chips">
+                    @for (h of handleEntries(s.handles); track h[0]) {
+                      <span class="seg-tag handle" [attr.data-platform]="h[0]" [title]="h[0]">{{ h[1] }}</span>
+                    }
+                  </div>
+                }
+                @if (s.keywords.length > 0) {
+                  <div class="seg-chips">
+                    @for (k of s.keywords; track k) { <span class="seg-tag kw">{{ k }}</span> }
+                  </div>
+                }
+                @if (s.hashtags.length > 0) {
+                  <div class="seg-chips">
+                    @for (tag of s.hashtags; track tag) { <span class="seg-tag hash">#{{ tag }}</span> }
+                  </div>
+                }
+
+                <div class="seg-hero-actions">
+                  <button type="button" class="seg-btn seg-btn-primary" (click)="openDetail(s)">Ver detalle →</button>
+                  <button type="button" class="seg-btn seg-btn-outline" (click)="openEdit(s)"
+                          [disabled]="busyId() === s.id">Editar</button>
+                  <button type="button" class="seg-btn-text" (click)="togglePause(s)"
+                          [disabled]="busyId() === s.id">
+                    {{ s.enabled ? 'Pausar' : 'Reactivar' }}
+                  </button>
+                  <button type="button" class="seg-btn-text muted" (click)="deleteSubject(s)"
+                          [disabled]="busyId() === s.id">Eliminar</button>
+                </div>
+              </div>
+            </article>
+          }
+        </section>
+      }
+
+      <!-- ===== 2 · TUS COMPETIDORES (compact cards, expand for details) ===== -->
+      @if (tierCompetitors().length > 0) {
+        <section class="seg-section">
+          <header class="seg-sechead">
+            <span class="seg-chip seg-chip-comp">2 · TUS COMPETIDORES</span>
+            <span class="seg-sechead-cap">
+              @if (tierCompetitors().length === 1) { Contra quién comparás share-of-voice. }
+              @else { {{ tierCompetitors().length }} cuentas contra las que SETIQ compara tu share-of-voice. }
+            </span>
+          </header>
+
+          <div class="seg-comp-grid">
+            @for (s of tierCompetitors(); track s.id) {
+              <article class="seg-comp-card"
+                       [class.dim]="!s.enabled"
+                       [class.expanded]="isSubjectExpanded(s.id)"
+                       [attr.data-kind]="s.kind">
+                <button type="button" class="seg-comp-head"
+                        [attr.aria-expanded]="isSubjectExpanded(s.id)"
+                        (click)="toggleSubject(s.id)">
+                  <div class="seg-comp-title-wrap">
+                    <h3 class="seg-comp-title">{{ s.label }}</h3>
+                    <span class="seg-comp-caret" aria-hidden="true">▾</span>
+                  </div>
+                  <div class="seg-comp-meta">
+                    <span class="seg-comp-count">{{ s.mention_count }}</span>
+                    <span class="seg-comp-when">· {{ formatLastMention(s.last_mention_at) }}</span>
+                    @if (!s.enabled) { <span class="seg-comp-paused">· Pausado</span> }
+                  </div>
+                </button>
+
+                @if (isSubjectExpanded(s.id)) {
+                  <div class="seg-comp-body">
+                    @if (handleEntries(s.handles).length > 0) {
+                      <div class="seg-chips">
+                        @for (h of handleEntries(s.handles); track h[0]) {
+                          <span class="seg-tag handle" [attr.data-platform]="h[0]" [title]="h[0]">{{ h[1] }}</span>
+                        }
+                      </div>
+                    }
+                    @if (s.keywords.length > 0) {
+                      <div class="seg-chips">
+                        @for (k of s.keywords; track k) { <span class="seg-tag kw">{{ k }}</span> }
+                      </div>
+                    }
+                    @if (s.hashtags.length > 0) {
+                      <div class="seg-chips">
+                        @for (tag of s.hashtags; track tag) { <span class="seg-tag hash">#{{ tag }}</span> }
+                      </div>
+                    }
+                    <div class="seg-comp-actions">
+                      <button type="button" class="seg-btn seg-btn-outline acc" (click)="openDetail(s)">Ver detalle →</button>
+                      <button type="button" class="seg-btn-text" (click)="openEdit(s)"
+                              [disabled]="busyId() === s.id">Editar</button>
+                      <button type="button" class="seg-btn-text" (click)="togglePause(s)"
+                              [disabled]="busyId() === s.id">
+                        {{ s.enabled ? 'Pausar' : 'Reactivar' }}
+                      </button>
+                      <button type="button" class="seg-btn-text muted" (click)="deleteSubject(s)"
+                              [disabled]="busyId() === s.id">Eliminar</button>
+                    </div>
+                  </div>
+                }
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ===== 3 · SEÑALES (temas + hashtags, row-based, super compact) ===== -->
+      @if (tierSignals().length > 0) {
+        <section class="seg-section">
+          <header class="seg-sechead">
+            <span class="seg-chip seg-chip-sig">3 · TEMAS Y HASHTAGS</span>
+            <span class="seg-sechead-cap">
+              Términos que SETIQ vigila para detectar tendencias. Nada acá pide acción — es contexto.
+            </span>
+          </header>
+
+          <div class="seg-sig-list">
+            @for (s of tierSignals(); track s.id) {
+              <div class="seg-sig-row"
+                   [class.dim]="!s.enabled"
+                   [class.expanded]="isSubjectExpanded(s.id)"
+                   [attr.data-kind]="s.kind">
+                <button type="button" class="seg-sig-head"
+                        [attr.aria-expanded]="isSubjectExpanded(s.id)"
+                        (click)="toggleSubject(s.id)">
+                  <span class="seg-sig-tag">{{ s.kind === 'hashtag' ? 'HASHTAG' : 'TEMA' }}</span>
+                  <span class="seg-sig-label">
+                    {{ s.kind === 'hashtag' ? '#' + s.label : s.label }}
+                  </span>
+                  <span class="seg-sig-count">{{ s.mention_count }}</span>
+                  <span class="seg-sig-when">{{ formatLastMention(s.last_mention_at) }}</span>
+                  <span class="seg-sig-caret" aria-hidden="true">▾</span>
+                </button>
+                @if (isSubjectExpanded(s.id)) {
+                  <div class="seg-sig-body">
+                    <p class="seg-sig-summary">
+                      {{ chipCountSummary(s) }}
+                      @if (!s.enabled) { · <span class="warn">Pausado</span> }
+                    </p>
+                    @if (s.keywords.length > 0) {
+                      <div class="seg-chips">
+                        @for (k of s.keywords; track k) { <span class="seg-tag kw">{{ k }}</span> }
+                      </div>
+                    }
+                    @if (s.hashtags.length > 0) {
+                      <div class="seg-chips">
+                        @for (tag of s.hashtags; track tag) { <span class="seg-tag hash">#{{ tag }}</span> }
+                      </div>
+                    }
+                    <div class="seg-sig-actions">
+                      <button type="button" class="seg-btn seg-btn-outline acc" (click)="openDetail(s)">Ver detalle →</button>
+                      <button type="button" class="seg-btn-text" (click)="openEdit(s)"
+                              [disabled]="busyId() === s.id">Editar</button>
+                      <button type="button" class="seg-btn-text" (click)="togglePause(s)"
+                              [disabled]="busyId() === s.id">
+                        {{ s.enabled ? 'Pausar' : 'Reactivar' }}
+                      </button>
+                      <button type="button" class="seg-btn-text muted" (click)="deleteSubject(s)"
+                              [disabled]="busyId() === s.id">Eliminar</button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ===== Nothing under current filter ===== -->
+      @if (d.length > 0 && tierBrand().length === 0 && tierCompetitors().length === 0 && tierSignals().length === 0) {
+        <app-empty-state state="empty"
+          message="No hay sujetos con este filtro."
+          hint="Probá la pestaña 'Todos' arriba, o agregá un nuevo sujeto." />
+      }
+
+      <!-- ===== Footer ===== -->
+      <div class="seg-foot">
+        <span>Apify recoge menciones públicas; Meta Graph trae las de tus canales conectados.</span>
+        <span>Los cambios se propagan al próximo ciclo de scraping.</span>
+      </div>
+    }
 
   </div>
 
+  <!-- ===== Add / edit modal ===== -->
   @if (showModal()) {
-    <div class="seg-modal-backdrop" (click)="closeModal()">
-      <div class="seg-modal" (click)="$event.stopPropagation()">
-        <header class="seg-modal-head">
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal-card seg-modal" (click)="$event.stopPropagation()">
+        <header class="modal-head">
           <h3>{{ editingId() ? 'Editar sujeto' : 'Agregar sujeto' }}</h3>
-          <button type="button" class="seg-modal-x" (click)="closeModal()" aria-label="Cerrar">×</button>
+          <button type="button" class="modal-close" (click)="closeModal()" aria-label="Cerrar">×</button>
         </header>
-        <form class="seg-form" (ngSubmit)="submit()">
+        <form class="modal-body seg-form" (ngSubmit)="submit()">
           <label class="seg-field">
             <span>Tipo</span>
             <select name="kind" [ngModel]="fKind()" (ngModelChange)="fKind.set($event)"
                     [disabled]="editingId() !== null">
-              <option value="competitor">Competidor</option>
               <option value="brand">Marca propia</option>
+              <option value="competitor">Competidor</option>
               <option value="keyword">Tema (keyword)</option>
               <option value="hashtag">Hashtag</option>
             </select>
@@ -184,56 +311,57 @@
                    [ngModel]="fHashtags()" (ngModelChange)="fHashtags.set($event)" />
           </label>
           @if (formError()) {
-            <p class="seg-form-error">{{ formError() }}</p>
+            <p class="modal-error">{{ formError() }}</p>
           }
-          <footer class="seg-modal-foot">
-            <button type="button" class="s-btn ghost" (click)="closeModal()" [disabled]="submitting()">Cancelar</button>
-            <button type="submit" class="s-btn acc" [disabled]="submitting()">
-              {{ submitting() ? 'Guardando…' : 'Agregar' }}
-            </button>
-          </footer>
         </form>
+        <footer class="modal-foot">
+          <button type="button" class="s-btn ghost" (click)="closeModal()" [disabled]="submitting()">Cancelar</button>
+          <button type="button" class="s-btn acc" (click)="submit()" [disabled]="submitting()">
+            {{ submitting() ? 'Guardando…' : (editingId() ? 'Guardar' : 'Agregar') }}
+          </button>
+        </footer>
       </div>
     </div>
   }
 
+  <!-- ===== Detail drawer (unchanged) ===== -->
   @if (showDetail()) {
-    <div class="seg-modal-backdrop" (click)="closeDetail()">
-      <div class="seg-detail" (click)="$event.stopPropagation()">
-        <header class="seg-modal-head">
+    <div class="modal-backdrop" (click)="closeDetail()">
+      <div class="modal-card seg-detail" (click)="$event.stopPropagation()">
+        <header class="modal-head">
           <h3>{{ detail()?.label ?? 'Detalle' }}</h3>
-          <button type="button" class="seg-modal-x" (click)="closeDetail()" aria-label="Cerrar">×</button>
+          <button type="button" class="modal-close" (click)="closeDetail()" aria-label="Cerrar">×</button>
         </header>
-        <div class="seg-detail-body">
+        <div class="modal-body seg-detail-body">
           @if (detailLoading()) {
             <p class="seg-detail-muted">Cargando detalle…</p>
           } @else if (detailError()) {
-            <p class="seg-form-error">{{ detailError() }}</p>
-          } @else if (detail(); as d) {
+            <p class="modal-error">{{ detailError() }}</p>
+          } @else if (detail(); as det) {
             <div class="seg-detail-stat">
-              <span class="num">{{ d.mention_count }}</span>
+              <span class="num">{{ det.mention_count }}</span>
               <span class="seg-detail-muted">menciones totales</span>
             </div>
 
             <section class="seg-detail-sec">
               <h4>Sentimiento</h4>
               <div class="seg-sent-bar">
-                <span class="pos" [style.width.%]="sentimentPct(d, 'positive')"></span>
-                <span class="neu" [style.width.%]="sentimentPct(d, 'neutral')"></span>
-                <span class="neg" [style.width.%]="sentimentPct(d, 'negative')"></span>
+                <span class="pos" [style.width.%]="sentimentPct(det, 'positive')"></span>
+                <span class="neu" [style.width.%]="sentimentPct(det, 'neutral')"></span>
+                <span class="neg" [style.width.%]="sentimentPct(det, 'negative')"></span>
               </div>
               <div class="seg-sent-legend">
-                <span><i class="dot pos"></i> Positivo {{ d.sentiment_breakdown.positive }}</span>
-                <span><i class="dot neu"></i> Neutral {{ d.sentiment_breakdown.neutral }}</span>
-                <span><i class="dot neg"></i> Negativo {{ d.sentiment_breakdown.negative }}</span>
+                <span><i class="dot pos"></i> Positivo {{ det.sentiment_breakdown.positive }}</span>
+                <span><i class="dot neu"></i> Neutral {{ det.sentiment_breakdown.neutral }}</span>
+                <span><i class="dot neg"></i> Negativo {{ det.sentiment_breakdown.negative }}</span>
               </div>
             </section>
 
             <section class="seg-detail-sec">
               <h4>Menciones recientes</h4>
-              @if (d.recent_mentions.length > 0) {
+              @if (det.recent_mentions.length > 0) {
                 <ul class="seg-mentions">
-                  @for (m of d.recent_mentions; track m.id) {
+                  @for (m of det.recent_mentions; track m.id) {
                     <li class="seg-mention">
                       <div class="seg-mention-head">
                         <span class="seg-mention-author">{{ m.author_display_name || m.author_handle || 'Anónimo' }}</span>
@@ -252,10 +380,10 @@
 
             <section class="seg-detail-sec">
               <h4>Solapamiento de audiencia</h4>
-              @if (d.audience_overlap.length > 0) {
+              @if (det.audience_overlap.length > 0) {
                 <div class="seg-chips">
-                  @for (c of d.audience_overlap; track c.id) {
-                    <span class="seg-chip">{{ c.display_name || 'Contacto' }}</span>
+                  @for (c of det.audience_overlap; track c.id) {
+                    <span class="seg-tag">{{ c.display_name || 'Contacto' }}</span>
                   }
                 </div>
               } @else {

@@ -7,39 +7,9 @@ import { TrackedSubjectsService } from '../../core/api/tracked-subjects.service'
 import { ApiTrackedSubject, ApiTrackedSubjectDetail, SubjectKind } from '../../core/api/types';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state';
 
-interface KindSection {
-  kind: SubjectKind;
-  label: string;
-  description: string;
-  subjects: ApiTrackedSubject[];
-}
-
-const KIND_META: Record<SubjectKind, { label: string; description: string; order: number }> = {
-  brand: {
-    label: 'Marca propia',
-    description: 'Palabras y hashtags que identifican a Thalma.',
-    order: 0,
-  },
-  competitor: {
-    label: 'Competidores',
-    description: 'Cuentas que se monitorean para benchmark + share-of-voice.',
-    order: 1,
-  },
-  keyword: {
-    label: 'Temas (keywords)',
-    description: 'Términos que Thalma sigue para detectar tendencias.',
-    order: 2,
-  },
-  hashtag: {
-    label: 'Hashtags',
-    description: 'Etiquetas seguidas en redes (Instagram, TikTok, X).',
-    order: 3,
-  },
-};
+type Filter = SubjectKind | 'all';
 
 const LAST_MENTION_FORMAT = new Intl.RelativeTimeFormat('es-BO', { numeric: 'auto' });
-
-type Filter = SubjectKind | 'all';
 
 @Component({
   selector: 'app-segmentos-page',
@@ -55,18 +25,18 @@ export class SegmentosPage implements OnInit {
   protected readonly data = signal<ApiTrackedSubject[] | null>(null);
   protected readonly error = signal<string | null>(null);
   protected readonly filter = signal<Filter>('all');
+  /** Per-subject expand state (collapsed by default). Brand is always expanded
+   * so it's not tracked here. */
+  protected readonly expandedSubjects = signal<ReadonlySet<string>>(new Set());
 
-  /** Counts per kind for the filter pills. */
+  // ---- Filter counts + options ----
   protected readonly counts = computed(() => {
     const subjects = this.data() ?? [];
-    const counts: Record<SubjectKind, number> = {
-      brand: 0, competitor: 0, keyword: 0, hashtag: 0,
-    };
+    const counts: Record<SubjectKind, number> = { brand: 0, competitor: 0, keyword: 0, hashtag: 0 };
     for (const s of subjects) counts[s.kind]++;
     return counts;
   });
 
-  /** Filter chip definitions in display order. */
   protected readonly filterOptions = computed<{ key: Filter; label: string; count: number }[]>(() => {
     const data = this.data() ?? [];
     const c = this.counts();
@@ -79,30 +49,26 @@ export class SegmentosPage implements OnInit {
     ];
   });
 
-  protected readonly sections = computed<KindSection[]>(() => {
+  // ---- Priority tiers (visual grouping) ----
+  private readonly filtered = computed<ApiTrackedSubject[]>(() => {
     const subjects = this.data() ?? [];
     const active = this.filter();
-    const buckets: Record<SubjectKind, ApiTrackedSubject[]> = {
-      brand: [], competitor: [], keyword: [], hashtag: [],
-    };
-    for (const s of subjects) {
-      if (active === 'all' || s.kind === active) buckets[s.kind].push(s);
-    }
-
-    return (Object.keys(buckets) as SubjectKind[])
-      .filter((k) => buckets[k].length > 0)
-      .sort((a, b) => KIND_META[a].order - KIND_META[b].order)
-      .map((k) => ({
-        kind: k,
-        label: KIND_META[k].label,
-        description: KIND_META[k].description,
-        subjects: buckets[k],
-      }));
+    return active === 'all' ? subjects : subjects.filter((s) => s.kind === active);
   });
 
-  setFilter(f: Filter): void {
-    this.filter.set(f);
-  }
+  protected readonly tierBrand = computed(() =>
+    this.filtered().filter((s) => s.kind === 'brand'),
+  );
+
+  protected readonly tierCompetitors = computed(() =>
+    this.filtered().filter((s) => s.kind === 'competitor'),
+  );
+
+  /** Keywords + hashtags share the "signals" tier — same visual treatment,
+   * same low-priority context role. Kind is preserved on each row for chip color. */
+  protected readonly tierSignals = computed(() =>
+    this.filtered().filter((s) => s.kind === 'keyword' || s.kind === 'hashtag'),
+  );
 
   protected readonly totalMentions = computed(() =>
     (this.data() ?? []).reduce((sum, s) => sum + (s.mention_count || 0), 0),
@@ -122,8 +88,6 @@ export class SegmentosPage implements OnInit {
     try {
       const list = await this.service.list();
       this.data.set(list);
-      // Honor ?subject=<id> — opens the drill-down drawer for that subject
-      // when the page loads (e.g. coming from the competitor panel on /overview).
       const subjectId = this.route.snapshot.queryParamMap.get('subject');
       if (subjectId) {
         const match = list.find((s) => s.id === subjectId);
@@ -132,6 +96,23 @@ export class SegmentosPage implements OnInit {
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : String(e));
     }
+  }
+
+  setFilter(f: Filter): void {
+    this.filter.set(f);
+  }
+
+  toggleSubject(id: string): void {
+    this.expandedSubjects.update((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  isSubjectExpanded(id: string): boolean {
+    return this.expandedSubjects().has(id);
   }
 
   formatLastMention(iso: string | undefined): string {
@@ -147,6 +128,17 @@ export class SegmentosPage implements OnInit {
   handleEntries(handles: Record<string, string>): Array<[string, string]> {
     return Object.entries(handles);
   }
+
+  chipCountSummary(s: ApiTrackedSubject): string {
+    const parts: string[] = [];
+    const h = this.handleEntries(s.handles).length;
+    if (h) parts.push(`${h} ${h === 1 ? 'handle' : 'handles'}`);
+    if (s.keywords.length) parts.push(`${s.keywords.length} kw`);
+    if (s.hashtags.length) parts.push(`${s.hashtags.length} tag`);
+    return parts.join(' · ') || 'sin señales';
+  }
+
+  // ---- Add / edit modal ----
 
   protected readonly showModal = signal(false);
   protected readonly submitting = signal(false);
@@ -173,9 +165,10 @@ export class SegmentosPage implements OnInit {
     this.fHashtags.set('');
   }
 
-  openModal(): void {
+  openModal(kind?: SubjectKind): void {
     this.editingId.set(null);
     this.resetForm();
+    if (kind) this.fKind.set(kind);
     this.showModal.set(true);
   }
 
@@ -229,12 +222,7 @@ export class SegmentosPage implements OnInit {
         );
       } else {
         const created = await this.service.create({
-          kind: this.fKind(),
-          label,
-          handles,
-          keywords,
-          hashtags,
-          enabled: true,
+          kind: this.fKind(), label, handles, keywords, hashtags, enabled: true,
         });
         this.data.update((list) => [created, ...(list ?? [])]);
       }
@@ -280,6 +268,8 @@ export class SegmentosPage implements OnInit {
       this.busyId.set(null);
     }
   }
+
+  // ---- Detail drawer (unchanged) ----
 
   protected readonly showDetail = signal(false);
   protected readonly detailLoading = signal(false);
