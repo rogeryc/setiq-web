@@ -130,6 +130,18 @@ app-ajustes-page { display: contents; }
   width: 180px;
 }
 
+.aj-voice-input {
+  width: 100%;
+  background: var(--card-2);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 100px;
+  max-height: 240px;
+  margin-top: 8px;
+}
+
 .aj-loaderr {
   background: rgba(229, 69, 69, 0.1);
   border: 1px solid rgba(229, 69, 69, 0.35);

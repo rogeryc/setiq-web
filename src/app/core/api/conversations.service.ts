@@ -16,6 +16,12 @@ interface ReplyResponse {
   external_id?: string;
 }
 
+export interface DraftReplyResponse {
+  text: string;
+  notes?: string;
+  model: string;
+}
+
 const API_BASE = '';
 
 @Injectable({ providedIn: 'root' })
@@ -57,6 +63,13 @@ export class ConversationsService {
     await this.auth.ensureLoggedIn();
     return firstValueFrom(
       this.http.post<ReplyResponse>(`${API_BASE}/conversations/${id}/reply`, { text }),
+    );
+  }
+
+  async draftReply(id: string): Promise<DraftReplyResponse> {
+    await this.auth.ensureLoggedIn();
+    return firstValueFrom(
+      this.http.post<DraftReplyResponse>(`${API_BASE}/conversations/${id}/draft-reply`, {}),
     );
   }
 }

@@ -91,6 +91,13 @@ export class AjustesPage implements OnInit, OnDestroy {
     return { ...CHANNEL_LABEL_DEFAULTS, ...(raw ?? {}) };
   });
 
+  protected readonly aiVoiceDescription = computed<string>(() => {
+    const raw = (this.tenant()?.settings as Record<string, unknown> | undefined)?.['ai_voice'] as
+      | { description?: string }
+      | undefined;
+    return raw?.description ?? '';
+  });
+
   protected readonly aiPolicyRows = [
     { key: 'tone_empathetic', label: 'Tono empático y profesional', sub: 'Aplica al estilo de las respuestas sugeridas.' },
     { key: 'auto_reply_faq',  label: 'Auto-responder consultas frecuentes', sub: 'Sólo después de aprobación humana.' },
@@ -199,6 +206,37 @@ export class AjustesPage implements OnInit, OnDestroy {
   }
 
   /** Inputs: optimistic local update, debounced PATCH. */
+  onAiVoiceChange(value: string): void {
+    this.tenant.update((t) => {
+      if (!t) return t;
+      const current = (t.settings as Record<string, unknown>)['ai_voice'] as
+        | Record<string, unknown>
+        | undefined;
+      return {
+        ...t,
+        settings: {
+          ...t.settings,
+          ai_voice: { ...(current ?? {}), description: value },
+        },
+      };
+    });
+
+    const key = 'ai_voice.description';
+    const existing = this.saveTimers.get(key);
+    if (existing) clearTimeout(existing);
+    this.saveTimers.set(
+      key,
+      setTimeout(() => {
+        this.persist(key, async () => {
+          const { settings } = await this.tenants.patchSettings({
+            ai_voice: { description: value },
+          });
+          this.tenant.update((t) => (t ? { ...t, settings } : t));
+        });
+      }, 600),
+    );
+  }
+
   onChannelLabelChange(platform: string, value: string): void {
     this.tenant.update((t) => {
       if (!t) return t;

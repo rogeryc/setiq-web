@@ -201,17 +201,28 @@
           </div>
           <div class="s-reply">
             <textarea class="s-reply-input"
-                      placeholder="Escribí una respuesta…"
+                      placeholder="Escribí una respuesta o pedile a la IA que la sugiera…"
                       [ngModel]="replyText()"
                       (ngModelChange)="replyText.set($event)"
-                      [disabled]="replying() || sel.status === 'resolved'"
+                      [disabled]="replying() || drafting() || sel.status === 'resolved'"
                       rows="2"></textarea>
-            <button type="button" class="s-btn acc s-reply-send"
-                    (click)="sendReply()"
-                    [disabled]="replying() || !replyText().trim() || sel.status === 'resolved'">
-              {{ replying() ? 'Enviando…' : 'Enviar' }}
-            </button>
+            <div class="s-reply-actions">
+              <button type="button" class="s-btn ghost s-reply-draft"
+                      (click)="draftReply()"
+                      [disabled]="drafting() || replying() || sel.status === 'resolved'"
+                      title="Redactar un borrador con IA (edítalo antes de enviar)">
+                {{ drafting() ? 'Pensando…' : '✨ Sugerir' }}
+              </button>
+              <button type="button" class="s-btn acc s-reply-send"
+                      (click)="sendReply()"
+                      [disabled]="replying() || drafting() || !replyText().trim() || sel.status === 'resolved'">
+                {{ replying() ? 'Enviando…' : 'Enviar' }}
+              </button>
+            </div>
           </div>
+          @if (draftNotes(); as n) {
+            <div class="s-reply-notes">💡 {{ n }}</div>
+          }
           @if (replyError(); as err) {
             <div class="s-reply-error" role="alert">{{ err }}</div>
           }

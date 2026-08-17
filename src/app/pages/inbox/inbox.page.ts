@@ -290,6 +290,36 @@ export class InboxPage implements OnInit {
   protected readonly replying = signal(false);
   protected readonly replyError = signal<string | null>(null);
 
+  // --- AI draft state ---
+  protected readonly drafting = signal(false);
+  protected readonly draftNotes = signal<string | null>(null);
+
+  async draftReply(): Promise<void> {
+    const id = this.selectedId();
+    if (!id || this.drafting() || this.replying()) return;
+    this.drafting.set(true);
+    this.draftNotes.set(null);
+    this.replyError.set(null);
+    try {
+      const res = await this.service.draftReply(id);
+      // Replace whatever's in the textarea with the AI draft. If the agent
+      // already typed something, we'd rather they know they're overwriting —
+      // for now we're aggressive; a "keep mine" prompt is a later polish.
+      this.replyText.set(res.text);
+      if (res.notes) this.draftNotes.set(res.notes);
+    } catch (e: unknown) {
+      const err = e as { status?: number; error?: { detail?: string } };
+      const detail = err.error?.detail;
+      this.replyError.set(
+        err.status === 400 ? 'No hay un mensaje entrante en esta conversación.' :
+        err.status === 502 ? 'El modelo de IA no respondió bien. Reintentá en un momento.' :
+        detail ?? 'No pudimos generar un borrador.'
+      );
+    } finally {
+      this.drafting.set(false);
+    }
+  }
+
   async sendReply(): Promise<void> {
     const id = this.selectedId();
     const text = this.replyText().trim();
